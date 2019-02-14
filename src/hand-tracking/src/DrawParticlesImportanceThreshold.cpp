@@ -63,6 +63,11 @@ void DrawParticlesImportanceThreshold::predictStep(const ParticleSet& prev_parti
        There is a coupling with the prediction and pose-related exogenous models. */
     exogenous_model_->setProperty("kin_pose_delta");
 
+    /* Step the time decreasing noise dynamics of the motion model.
+       If the effective state model used does not have time decreasing noise dynamics,
+       the following will be ignored. */
+    state_model_->setProperty("tdd_advance");
+
     for (int j = 0; j < prev_particles.weight().size(); ++j)
     {
         VectorXd tmp_state = VectorXd::Zero(prev_particles.state().rows());
@@ -73,7 +78,9 @@ void DrawParticlesImportanceThreshold::predictStep(const ParticleSet& prev_parti
             tmp_state = prev_particles.state(j);
 
         if (!getSkipState() && std::exp(prev_particles.weight(j)) <= threshold)
+        {
             state_model_->motion(tmp_state, pred_particles.state(j));
+        }
         else
             pred_particles.state(j) = tmp_state;
     }
