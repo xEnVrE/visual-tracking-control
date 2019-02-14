@@ -13,7 +13,7 @@
 #include <yarp/os/Value.h>
 #include <opencv2/core/core.hpp>
 
-#include <BrownianMotionPose.h>
+#include <BrownianMotionPoseWithTimeDynamics.h>
 #include <ChiSquare.h>
 #include <DrawParticlesImportanceThreshold.h>
 #include <NormOne.h>
@@ -94,12 +94,13 @@ int main(int argc, char *argv[])
 
     /* Get Brownian Motion parameters */
     yarp::os::Bottle bottle_brownianmotion_params = rf.findGroup("BROWNIANMOTION");
-    paramsd["q_x"]        = bottle_brownianmotion_params.check("q_x",        Value(0.005)).asDouble();
-    paramsd["q_y"]        = bottle_brownianmotion_params.check("q_y",        Value(0.005)).asDouble();
-    paramsd["q_z"]        = bottle_brownianmotion_params.check("q_z",        Value(0.005)).asDouble();
-    paramsd["q_yaw"]      = bottle_brownianmotion_params.check("q_yaw",      Value(0.001)).asDouble();
-    paramsd["q_pitch"]    = bottle_brownianmotion_params.check("q_pitch",    Value(0.001)).asDouble();
-    paramsd["q_roll"]      = bottle_brownianmotion_params.check("q_roll",      Value(0.001)).asDouble();
+    paramsd["q_x"]             = bottle_brownianmotion_params.check("q_x",                Value(0.005)).asDouble();
+    paramsd["q_y"]             = bottle_brownianmotion_params.check("q_y",                Value(0.005)).asDouble();
+    paramsd["q_z"]             = bottle_brownianmotion_params.check("q_z",                Value(0.005)).asDouble();
+    paramsd["q_yaw"]           = bottle_brownianmotion_params.check("q_yaw",              Value(0.001)).asDouble();
+    paramsd["q_pitch"]         = bottle_brownianmotion_params.check("q_pitch",            Value(0.001)).asDouble();
+    paramsd["q_roll"]          = bottle_brownianmotion_params.check("q_roll",             Value(0.001)).asDouble();
+    paramsd["tdd_num_seconds"] = bottle_brownianmotion_params.check("tdd_num_seconds",    Value(1.0)).asDouble();
 
     /* Get Visual Proprioception parameters */
     yarp::os::Bottle bottle_visualproprioception_params = rf.findGroup("VISUALPROPRIOCEPTION");
@@ -141,12 +142,13 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - play:"           << (paramsd["play"] == 1.0 ? "true" : "false");
 
     yInfo() << log_ID << "Motion modle parameters:";
-    yInfo() << log_ID << " - q_x:"        << paramsd["q_x"];
-    yInfo() << log_ID << " - q_y:"        << paramsd["q_y"];
-    yInfo() << log_ID << " - q_z:"        << paramsd["q_z"];
-    yInfo() << log_ID << " - q_yaw:"      << paramsd["q_yaw"];
-    yInfo() << log_ID << " - q_pitch:"    << paramsd["q_pitch"];
-    yInfo() << log_ID << " - q_roll:"      << paramsd["q_roll"];
+    yInfo() << log_ID << " - q_x:"             << paramsd["q_x"];
+    yInfo() << log_ID << " - q_y:"             << paramsd["q_y"];
+    yInfo() << log_ID << " - q_z:"             << paramsd["q_z"];
+    yInfo() << log_ID << " - q_yaw:"           << paramsd["q_yaw"];
+    yInfo() << log_ID << " - q_pitch:"         << paramsd["q_pitch"];
+    yInfo() << log_ID << " - q_roll:"          << paramsd["q_roll"];
+    yInfo() << log_ID << " - tdd_num_seconds:" << paramsd["tdd_num_seconds"];
 
     yInfo() << log_ID << "Sensor model parameters:";
     yInfo() << log_ID << " - use_thumb:"   << paramsd["use_thumb"];
@@ -185,7 +187,7 @@ int main(int argc, char *argv[])
 
 
     /* MOTION MODEL */
-    std::unique_ptr<StateModel> brown(new BrownianMotionPose(paramsd["q_x"], paramsd["q_y"], paramsd["q_z"], paramsd["q_yaw"], paramsd["q_pitch"], paramsd["q_roll"], paramsd["seed"]));
+    std::unique_ptr<StateModel> brown(new BrownianMotionPoseWithTimeDynamics(paramsd["q_x"], paramsd["q_y"], paramsd["q_z"], paramsd["q_yaw"], paramsd["q_pitch"], paramsd["q_roll"], paramsd["tdd_num_seconds"], paramsd["seed"]));
 
     std::unique_ptr<ExogenousModel> robot_motion;
     if (paramss["robot"] == "icub")
