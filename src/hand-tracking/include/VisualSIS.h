@@ -81,6 +81,8 @@ protected:
 
     std::string gpu_engine_count_to_string(const int engine_count) const;
 
+    void resetTimeDecreasingNoiseDynamics();
+
 private:
     const std::string log_ID_ = "[VisualSIS]";
 

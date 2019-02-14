@@ -227,6 +227,7 @@ bool VisualSIS::run_filter()
 
 bool VisualSIS::reset_filter()
 {
+    resetTimeDecreasingNoiseDynamics();
     reset();
 
     return true;
@@ -235,6 +236,7 @@ bool VisualSIS::reset_filter()
 
 bool VisualSIS::stop_filter()
 {
+    resetTimeDecreasingNoiseDynamics();
     reboot();
 
     return true;
@@ -345,4 +347,13 @@ std::string VisualSIS::gpu_engine_count_to_string(const int engine_count) const
     if (engine_count == 1) return "the device can concurrently copy memory between host and device while executing a kernel";
     if (engine_count == 2) return "the device can concurrently copy memory between host and device in both directions and execute a kernel at the same time";
     return "wrong argument...!";
+}
+
+
+void VisualSIS::resetTimeDecreasingNoiseDynamics()
+{
+    /* Reset the time decreasing noise dynamics of the motion model.
+       If the effective state model used does not have time decreasing noise dynamics,
+       the following will be ignored. */
+    prediction_->getStateModel().setProperty("tdd_reset");
 }
