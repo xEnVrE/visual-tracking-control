@@ -128,6 +128,7 @@ endif()
 # Application source and header files
 set(${EXE_TARGET_NAME}_HDR
         include/BrownianMotionPose.h
+        include/BrownianMotionPoseWithTimeDynamics.h
         include/Camera.h
         include/ChiSquare.h
         include/DrawParticlesImportanceThreshold.h
@@ -162,6 +163,7 @@ set(${EXE_TARGET_NAME}_HDR
 set(${EXE_TARGET_NAME}_SRC
         src/main.cpp
         src/BrownianMotionPose.cpp
+        src/BrownianMotionPoseWithTimeDynamics.cpp
         src/DrawParticlesImportanceThreshold.cpp
         src/KinPoseModel.cpp
         src/KinPoseModelAxisAngle.cpp
