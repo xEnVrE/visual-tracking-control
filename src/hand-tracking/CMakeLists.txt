@@ -163,6 +163,7 @@ set(${EXE_TARGET_NAME}_HDR
       include/PlayWalkmanPoseModel.h
       include/ReceiveMasks.h
       include/VisualProprioception.h
+      include/VisualProprioceptionSiamese.h
       include/VisualSIS.h
       include/WalkmanArmModel.h
       include/WalkmanCamera.h
@@ -204,6 +205,7 @@ set(${EXE_TARGET_NAME}_CPU_SRC
       src/cpu/NormTwoKLD.cpp
       src/cpu/NormTwoKLDChiSquare.cpp
       src/cpu/VisualProprioception.cpp
+      src/cpu/VisualProprioceptionSiamese.cpp
 )
 
 set(${EXE_TARGET_NAME}_CUDA_SRC
