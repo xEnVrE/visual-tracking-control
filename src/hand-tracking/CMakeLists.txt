@@ -161,6 +161,7 @@ set(${EXE_TARGET_NAME}_HDR
       include/PlayiCubFwdKinModel.h
       include/PlayGatePose.h
       include/PlayWalkmanPoseModel.h
+      include/ReceiveMasks.h
       include/VisualProprioception.h
       include/VisualSIS.h
       include/WalkmanArmModel.h
@@ -187,6 +188,7 @@ set(${EXE_TARGET_NAME}_SRC
       src/PlayiCubFwdKinModel.cpp
       src/PlayGatePose.cpp
       src/PlayWalkmanPoseModel.cpp
+      src/ReceiveMasks.cpp
       src/VisualSIS.cpp
       src/WalkmanArmModel.cpp
       src/WalkmanCamera.cpp
