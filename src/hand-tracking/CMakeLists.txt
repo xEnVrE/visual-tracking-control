@@ -139,6 +139,7 @@ set(${EXE_TARGET_NAME}_HDR
       include/Camera.h
       include/ChiSquare.h
       include/DrawParticlesImportanceThreshold.h
+      include/DrawParticlesImportanceThresholdSiamese.h
       include/KinPoseModel.h
       include/KinPoseModelAxisAngle.h
       include/GatePose.h
@@ -151,6 +152,7 @@ set(${EXE_TARGET_NAME}_HDR
       include/InitPoseParticlesAxisAngle.h
       include/InitPoseParticlesSiamese.h
       include/InitWalkmanArm.h
+      include/IoU.h
       include/KLD.h
       include/MeshModel.h
       include/NormOne.h
@@ -171,9 +173,10 @@ set(${EXE_TARGET_NAME}_HDR
 )
 
 set(${EXE_TARGET_NAME}_SRC
-      src/main.cpp
+      #src/main.cpp
       src/BrownianMotionPose.cpp
       src/DrawParticlesImportanceThreshold.cpp
+      src/DrawParticlesImportanceThresholdSiamese.cpp
       src/KinPoseModel.cpp
       src/KinPoseModelAxisAngle.cpp
       src/GatePose.cpp
@@ -190,6 +193,7 @@ set(${EXE_TARGET_NAME}_SRC
       src/PlayGatePose.cpp
       src/PlayWalkmanPoseModel.cpp
       src/ReceiveMasks.cpp
+      src/SiameseMain.cpp
       src/VisualSIS.cpp
       src/WalkmanArmModel.cpp
       src/WalkmanCamera.cpp
@@ -198,6 +202,7 @@ set(${EXE_TARGET_NAME}_SRC
 
 set(${EXE_TARGET_NAME}_CPU_SRC
       src/cpu/ChiSquare.cpp
+      src/cpu/IoU.cpp
       src/cpu/KLD.cpp
       src/cpu/NormOne.cpp
       src/cpu/NormTwo.cpp
