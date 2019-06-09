@@ -68,8 +68,6 @@ bool VisualSIS::initialization()
 
     initialization_->initialize(pred_particle_);
 
-    prediction_->getExogenousModel().setProperty("init");
-
     skip("all", false);
 
     return true;
