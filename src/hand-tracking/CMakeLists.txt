@@ -374,6 +374,7 @@ set(${EXE_TARGET_NAME}_SHADER_VERT
 set(${EXE_TARGET_NAME}_SHADER_FRAG
       ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_frame.frag
       ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model.frag
+      ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_model_texture.frag
       ${CMAKE_CURRENT_SOURCE_DIR}/shader/shader_background.frag
 )
 
