@@ -24,6 +24,27 @@
   </module>
 
   <module>
+    <name>yarpview</name>
+    <parameters>--name /object-tracking/viewer/groundtruthImage:i</parameters>
+    <node>localhost</node>
+    <prefix></prefix>
+  </module>
+
+  <module>
+    <name>yarpview</name>
+    <parameters>--name /object-tracking/viewer/maskImage:i</parameters>
+    <node>localhost</node>
+    <prefix></prefix>
+  </module>
+
+  <module>
+    <name>yarpview</name>
+    <parameters>--name /object-tracking/viewer/rgbImage:i</parameters>
+    <node>localhost</node>
+    <prefix></prefix>
+  </module>
+
+  <module>
     <name>yarpdev</name>
     <parameters>--context object-tracking-siamese --from realsense2_dev.ini</parameters>
     <node>localhost</node>
@@ -44,6 +65,25 @@
   <!--   <to></to> -->
   <!--   <protocol>tcp</protocol> -->
   <!-- </connection> -->
+
+  <!-- Viewers -->
+  <connection>
+    <from>/depthCamera/rgbImage:o</from>
+    <to>/object-tracking/viewer/rgbImage:i</to>
+    <protocol>mjpeg</protocol>
+  </connection>
+
+  <connection>
+    <from>/object-tracking-ground-truth/estimateMarkerImage:o</from>
+    <to>/object-tracking/viewer/rgbImage:i</to>
+    <protocol>mjpeg</protocol>
+  </connection>
+
+  <connection>
+    <from>/instanceSegmenter/maskImage:o</from>
+    <to>/object-tracking/viewer/maskImage:i</to>
+    <protocol>mjpeg</protocol>
+  </connection>
 
   <!-- Camera to ground-truth module -->
   <connection>
