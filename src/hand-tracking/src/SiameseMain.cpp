@@ -328,11 +328,9 @@ int main(int argc, char *argv[])
     }
 
     /* CORRECTION */
-    std::unique_ptr<PFCorrection> vpf_update_particles(new BootstrapCorrection());
-    vpf_update_particles->setLikelihoodModel(std::move(likelihood));
-    vpf_update_particles->setMeasurementModel(std::move(proprio));
-
-    std::unique_ptr<PFCorrection> vpf_correction = std::move(vpf_update_particles);
+    std::unique_ptr<PFCorrection> vpf_correction(new BootstrapCorrection());
+    vpf_correction->setLikelihoodModel(std::move(likelihood));
+    vpf_correction->setMeasurementModel(std::move(proprio));
 
     /* RESAMPLING */
     std::unique_ptr<Resampling> pf_resampling;
