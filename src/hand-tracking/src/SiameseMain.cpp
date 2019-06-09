@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 
     ResourceFinder rf;
     rf.setVerbose();
-    rf.setDefaultContext("hand-tracking");
+    rf.setDefaultContext("object-tracking-siamese");
     rf.setDefaultConfigFile("config.ini");
     rf.configure(argc, argv);
 
