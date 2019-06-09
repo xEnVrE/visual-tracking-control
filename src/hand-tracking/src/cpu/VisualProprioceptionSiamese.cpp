@@ -13,16 +13,17 @@
 #include <cmath>
 #include <exception>
 #include <iostream>
-#include <utility>
-#include <yarp/sig/all.h>
 #include <vector>
+
 #include <yarp/sig/Vector.h>
+#include <yarp/os/ResourceFinder.h>
 
 #include <opencv2/imgcodecs/imgcodecs.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 
 using namespace Eigen;
 using namespace hand_tracking::utils;
+using namespace yarp::os;
 
 
 struct VisualProprioceptionSiamese::ImplData
@@ -49,8 +50,8 @@ VisualProprioceptionSiamese::VisualProprioceptionSiamese
 (
     std::unique_ptr<ReceiveMasks> receive_masks,
     const int num_requested_images,
-    const std::string object_mesh_path, 
-    const std::string shader_folder
+    const std::string& object_name,
+    const std::string& context
 ) :
     pImpl_(std::unique_ptr<ImplData>(new ImplData))
 {
@@ -65,15 +66,42 @@ VisualProprioceptionSiamese::VisualProprioceptionSiamese
     rImpl.cam_params_.cx = 309.493408203124;
     rImpl.cam_params_.cy = 235.852325439454;
 
+    ResourceFinder rf;
+    rf.setVerbose(true);
+
+    // Get object mesh path
+    rf.setDefaultContext(context + "/mesh");
+    std::string mesh_path = rf.findFileByName(object_name + ".obj");
+    if (mesh_path.empty())
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTIONSIAMESE::CTOR::DIR\nERROR: mesh path not found!");
+    else
+        std::cout << "INFO::VISUALPROPRIOCEPTION::CTOR\n Found mesh path:" << mesh_path << std::endl;
+
+    // Get shader path
+    rf.setDefaultContext(context + "/shader");
+    std::string shader_path = rf.findFileByName("shader_model.vert");
+    if (shader_path.empty())
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTIONSIAMESE::CTOR::DIR\nERROR: shader directory not found!");
+
+    size_t rfind_slash = shader_path.rfind("/");
+    if (rfind_slash == std::string::npos)
+        rfind_slash = 0;
+    size_t rfind_backslash = shader_path.rfind("\\");
+    if (rfind_backslash == std::string::npos)
+        rfind_backslash = 0;
+
+    shader_path = shader_path.substr(0, rfind_slash > rfind_backslash ? rfind_slash : rfind_backslash);
+    std::cout << "INFO::VISUALPROPRIOCEPTION::CTOR\n Found shader directory:" << shader_path << std::endl;
+
     SICAD::ModelPathContainer path_container;
-    path_container["object"] = object_mesh_path;
+    path_container["object"] = mesh_path;
     try
     {
         rImpl.si_cad_ = std::unique_ptr<SICAD>(new SICAD(path_container,
                                                          rImpl.cam_params_.width, rImpl.cam_params_.height,
                                                          rImpl.cam_params_.fx, rImpl.cam_params_.fy, rImpl.cam_params_.cx, rImpl.cam_params_.cy,
                                                          num_requested_images,
-                                                         shader_folder,
+                                                         shader_path,
                                                          { 1.0, 0.0, 0.0, static_cast<float>(M_PI) }));
     }
     catch (const std::runtime_error& e)

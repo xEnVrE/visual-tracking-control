@@ -26,7 +26,7 @@
 class VisualProprioceptionSiamese : public bfl::MeasurementModel
 {
 public:
-    VisualProprioceptionSiamese(std::unique_ptr<ReceiveMasks> receive_masks, const int num_requested_images, const std::string object_mesh_path, const std::string shader_folder);
+    VisualProprioceptionSiamese(std::unique_ptr<ReceiveMasks> receive_masks, const int num_requested_images, const std::string& object_name, const std::string& context);
 
     virtual ~VisualProprioceptionSiamese() noexcept;
 

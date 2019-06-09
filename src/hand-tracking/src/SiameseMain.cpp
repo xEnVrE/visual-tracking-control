@@ -147,8 +147,9 @@ int main(int argc, char *argv[])
     yarp::os::Bottle bottle_visualproprioception_params = rf.findGroup("VISUALPROPRIOCEPTION");
     paramsd["use_thumb"]   = bottle_visualproprioception_params.check("use_thumb", Value(0.0)).asDouble();
     paramsd["use_forearm"] = bottle_visualproprioception_params.check("use_forearm", Value(0.0)).asDouble();
-    paramss["object_mesh_path"] = bottle_visualproprioception_params.check("object_mesh_path", Value("/home/yuriy/robot-code/visual-tracking-control/src/hand-tracking/mesh/object.obj")).asString();
-    paramss["shader_path"] = bottle_visualproprioception_params.check("shader_path", Value("/home/yuriy/robot-code/visual-tracking-control/src/hand-tracking/shader")).asString();
+    paramss["object_name"] = bottle_visualproprioception_params.check("object_name", Value("mustard_bottle")).asString();
+    // paramss["object_mesh_path"] = bottle_visualproprioception_params.check("object_mesh_path", Value("/home/yuriy/robot-code/visual-tracking-control/src/hand-tracking/mesh/object.obj")).asString();
+    // paramss["shader_path"] = bottle_visualproprioception_params.check("shader_path", Value("/home/yuriy/robot-code/visual-tracking-control/src/hand-tracking/shader")).asString();
 
 
     /* Get Likelihood parameters */
@@ -286,8 +287,10 @@ int main(int argc, char *argv[])
     {
         proprio = std::unique_ptr<VisualProprioceptionSiamese>(new VisualProprioceptionSiamese(std::move(receive_masks),
                                                                                                paramsd["num_images"],
-                                                                                               paramss["object_mesh_path"],
-                                                                                               paramss["shader_path"]));
+                                                                                               paramss["object_name"],
+                                                                                               rf.getContext()));
+                                                                                               // paramss["object_mesh_path"],
+                                                                                               // paramss["shader_path"]));
    
         paramsd["num_particles"] = proprio->getNumberOfUsedParticles();
 
@@ -379,7 +382,7 @@ int main(int argc, char *argv[])
                       paramss["cam_sel"],
                       paramsd["num_particles"],
                       paramsd["resample_ratio"],
-                      "object-tracking-siamese");
+                      rf.getContext());
 
 
     vsis_pf.boot();
