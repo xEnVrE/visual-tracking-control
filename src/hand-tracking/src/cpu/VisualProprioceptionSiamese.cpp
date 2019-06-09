@@ -15,7 +15,10 @@
 #include <iostream>
 #include <vector>
 
+#include <yarp/dev/IRGBDSensor.h>
+#include <yarp/dev/PolyDriver.h>
 #include <yarp/sig/Vector.h>
+#include <yarp/os/Property.h>
 #include <yarp/os/ResourceFinder.h>
 
 #include <opencv2/imgcodecs/imgcodecs.hpp>
@@ -59,15 +62,67 @@ VisualProprioceptionSiamese::VisualProprioceptionSiamese
 
     rImpl.receive_masks_ = std::move(receive_masks);
 
-    rImpl.cam_params_.width = 640;
-    rImpl.cam_params_.height = 480;
-    rImpl.cam_params_.fx = 617.170349121094;
-    rImpl.cam_params_.fy = 616.72265625;
-    rImpl.cam_params_.cx = 309.493408203124;
-    rImpl.cam_params_.cy = 235.852325439454;
+    // Get camera intrinsic parameters
+    Property properties;
+    properties.put("device", "RGBDSensorClient");
+    properties.put("localImagePort",  "/visual-proprioception-siamese/RGBDSensorClient/image:i");
+    properties.put("localDepthPort",  "/visual-proprioception-siamese/RGBDSensorClient/depth:i");
+    properties.put("localRpcPort",    "/visual-proprioception-siamese/RGBDSensorClient/rpc:i");
+    properties.put("remoteImagePort", "/depthCamera/rgbImage:o");
+    properties.put("remoteDepthPort", "/depthCamera/depthImage:o");
+    properties.put("remoteRpcPort",   "/depthCamera/rpc:i");
+
+    yarp::dev::PolyDriver rgbd_drv;
+    yarp::dev::IRGBDSensor* irgbd;
+    if (rgbd_drv.open(properties) && rgbd_drv.view(irgbd) && (irgbd != nullptr))
+    {
+        std::cout << "INFO::VISUALPROPRIOCEPTION::CTOR\n Getting intrinsic parameters from camera driver." << std::endl;
+
+        yarp::os::Property camera_intrinsics;
+        irgbd->getRgbIntrinsicParam(camera_intrinsics);
+
+        rImpl.cam_params_.width = irgbd->getRgbWidth();
+        rImpl.cam_params_.height = irgbd->getRgbHeight();
+        rImpl.cam_params_.fx = camera_intrinsics.find("focalLengthX").asFloat64();
+        rImpl.cam_params_.fy = camera_intrinsics.find("focalLengthY").asFloat64();
+        rImpl.cam_params_.cx = camera_intrinsics.find("principalPointX").asFloat64();
+        rImpl.cam_params_.cy = camera_intrinsics.find("principalPointY").asFloat64();
+
+        rgbd_drv.close();
+    }
+    else
+    {
+        std::cout << "INFO::VISUALPROPRIOCEPTION::CTOR" << std::endl
+                  << "Camera driver not ready, reading intrinsic paramers from fallback configuration" << std::endl;
+        std::cout << "INFO::VISUALPROPRIOCEPTION::CTOR" << std::endl
+                  << "Using fallback configuration 'camera_640_480'" << std::endl;
+
+        ResourceFinder rf;
+        rf.setVerbose(false);
+        rf.setDefaultContext(context);
+        rf.setDefaultConfigFile("realsense_camera_config.ini");
+        rf.configure(0, nullptr);
+
+        ResourceFinder rf_camera = rf.findNestedResourceFinder("camera_640_480");
+        rImpl.cam_params_.width = rf_camera.find("width").asDouble();
+        rImpl.cam_params_.height = rf_camera.find("height").asDouble();
+        rImpl.cam_params_.fx = rf_camera.find("fx").asDouble();
+        rImpl.cam_params_.fy = rf_camera.find("fy").asDouble();
+        rImpl.cam_params_.cx = rf_camera.find("cx").asDouble();
+        rImpl.cam_params_.cy = rf_camera.find("cy").asDouble();
+    }
+
+    std::cout << "INFO::VISUALPROPRIOCEPTION::CTOR" << std::endl
+              << "Camera intrinsic parameters are:" << std::endl
+              << "- width:" << rImpl.cam_params_.width << std::endl
+              << "- height:" << rImpl.cam_params_.width << std::endl
+              << "- fx:" << rImpl.cam_params_.fx << std::endl
+              << "- fy:" << rImpl.cam_params_.fy << std::endl
+              << "- cx:" << rImpl.cam_params_.cx << std::endl
+              << "- cy:" << rImpl.cam_params_.cy << std::endl;
 
     ResourceFinder rf;
-    rf.setVerbose(true);
+    rf.setVerbose(false);
 
     // Get object mesh path
     rf.setDefaultContext(context + "/mesh");
@@ -75,13 +130,14 @@ VisualProprioceptionSiamese::VisualProprioceptionSiamese
     if (mesh_path.empty())
         throw std::runtime_error("ERROR::VISUALPROPRIOCEPTIONSIAMESE::CTOR::DIR\nERROR: mesh path not found!");
     else
-        std::cout << "INFO::VISUALPROPRIOCEPTION::CTOR\n Found mesh path:" << mesh_path << std::endl;
+        std::cout << "INFO::VISUALPROPRIOCEPTION::CTOR" << std::endl
+                  << "Found mesh path:" << mesh_path << std::endl;
 
     // Get shader path
     rf.setDefaultContext(context + "/shader");
     std::string shader_path = rf.findFileByName("shader_model.vert");
     if (shader_path.empty())
-        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTIONSIAMESE::CTOR::DIR\nERROR: shader directory not found!");
+        throw std::runtime_error("ERROR::VISUALPROPRIOCEPTIONSIAMESE::CTOR::DIR\n\t ERROR: shader directory not found!");
 
     size_t rfind_slash = shader_path.rfind("/");
     if (rfind_slash == std::string::npos)
@@ -114,7 +170,8 @@ VisualProprioceptionSiamese::VisualProprioceptionSiamese
 }
 
 
-VisualProprioceptionSiamese::~VisualProprioceptionSiamese() noexcept = default;
+VisualProprioceptionSiamese::~VisualProprioceptionSiamese()
+{ }
 
 
 std::pair<bool, bfl::Data> VisualProprioceptionSiamese::measure(const bfl::Data& data) const
