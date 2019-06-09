@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="yarpmanifest.xsl"?>
+<application>
+  <name>object-tracking-siamese</name>
+  <description></description>
+
+  <!-- MODULES -->
+  <module>
+    <name>object-tracking-siamese</name>
+    <parameters></parameters>
+    <node>localhost</node>
+  </module>
+
+  <module>
+    <name>object-tracking-ground-truth</name>
+    <parameters></parameters>
+    <node>localhost</node>
+  </module>
+
+  <module>
+    <name>object-tracking-viewer</name>
+    <parameters>--context object-tracking-viewer-realsense</parameters>
+    <node>localhost</node>
+  </module>
+
+  <module>
+    <name>yarpdev</name>
+    <parameters>--context object-tracking-siamese --from realsense2_dev.ini</parameters>
+    <node>localhost</node>
+  </module>
+
+  <!-- CONNECTIONS -->
+
+  <!-- In case RGB image from realsense is needed... -->
+  <!-- <connection> -->
+  <!--   <from>/depthCamera/rgbImage:o</from> -->
+  <!--   <to></to> -->
+  <!--   <protocol>mjpeg</protocol> -->
+  <!-- </connection> -->
+
+  <!-- In case depth from realsense is needed... -->
+  <!-- <connection> -->
+  <!--   <from>/depthCamera/depthImage:o</from> -->
+  <!--   <to></to> -->
+  <!--   <protocol>tcp</protocol> -->
+  <!-- </connection> -->
+
+  <!-- Camera to ground-truth module -->
+  <connection>
+    <from>/depthCamera/rgbImage:o</from>
+    <to>/object-tracking-ground-truth/rgbImage:i</to>
+    <protocol>mjpeg</protocol>
+  </connection>
+
+  <!-- Ground truth to particle initialization -->
+  <connection>
+    <from>/object-tracking-ground-truth/estimate:o</from>
+    <to>/siamese/init_particles:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <!-- Ground truth to particle initialization for resampling with prior -->
+  <connection>
+    <from>/object-tracking-ground-truth/estimate:o</from>
+    <to>/resampling-with-prior/init_particles:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <!-- Camera to 3D Viewer -->
+  <connection>
+    <from>/depthCamera/rgbImage:o</from>
+    <to>/object-tracking-viewer/rgbImage:i</to>
+    <protocol>mjpeg</protocol>
+  </connection>
+
+  <!-- Camera depth to 3D Viewer -->
+  <connection>
+    <from>/depthCamera/depthImage:o</from>
+    <to>/object-tracking-viewer/depthImage:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <!-- Ground truth to 3D viewer -->
+  <connection>
+    <from>/object-tracking-ground-truth/estimate:o</from>
+    <to>/object-tracking-viewer/ground-truth:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <!-- Estimate to 3D viewer -->
+  <connection>
+    <from>/object-tracking-siamese/estimate:o</from>
+    <to>/object-tracking-viewer/estimate:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <!-- Siamese network to mask reception part  -->
+  <connection>
+    <from>/instanceSegmenter/maskImage:o</from>
+    <to>/siamese/read_masks:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+</application>
