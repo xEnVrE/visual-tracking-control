@@ -332,29 +332,7 @@ int main(int argc, char *argv[])
     vpf_update_particles->setLikelihoodModel(std::move(likelihood));
     vpf_update_particles->setMeasurementModel(std::move(proprio));
 
-    std::unique_ptr<PFCorrection> vpf_correction;
-
-    if (paramsd["gate_pose"] == 1.0)
-    {
-        std::cerr << "GatePose is disabled due to a change in the interface!" << std::endl;
-
-        return EXIT_FAILURE;
-
-//        if (paramsd["play"] != 1.0)
-//            vpf_correction = std::unique_ptr<iCubGatePose>(new iCubGatePose(std::move(vpf_update_particles),
-//                                                                            paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
-//                                                                            paramsd["gate_aperture"], paramsd["gate_rotation"],
-//                                                                            paramss["robot"], paramss["laterality"],
-//                                                                            "handTracking/iCubGatePose/" + paramss["cam_sel"]));
-//        else
-//            vpf_correction = std::unique_ptr<PlayGatePose>(new PlayGatePose(std::move(vpf_update_particles),
-//                                                                            paramsd["gate_x"], paramsd["gate_y"], paramsd["gate_z"],
-//                                                                            paramsd["gate_aperture"], paramsd["gate_rotation"],
-//                                                                            paramss["robot"], paramss["laterality"],
-//                                                                            "handTracking/PlayGatePose/" + paramss["cam_sel"]));
-    }
-    else
-        vpf_correction = std::move(vpf_update_particles);
+    std::unique_ptr<PFCorrection> vpf_correction = std::move(vpf_update_particles);
 
     /* RESAMPLING */
     std::unique_ptr<Resampling> pf_resampling;
@@ -362,16 +340,16 @@ int main(int argc, char *argv[])
         pf_resampling = std::unique_ptr<Resampling>(new Resampling());
     else
     {
-        std::unique_ptr<ParticleSetInitialization> resample_init_arm;
+        std::unique_ptr<ParticleSetInitialization> resample_init;
 
         if (paramss["robot"] == "icub")
-            resample_init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitiCubArm/" + paramss["cam_sel"]));
+            resample_init = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitiCubArm/" + paramss["cam_sel"]));
         else if (paramss["robot"] == "walkman")
-            resample_init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitWalkmanArm/" + paramss["cam_sel"]));
+            resample_init = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitWalkmanArm/" + paramss["cam_sel"]));
         else if (paramss["robot"] == "siamese")
-            resample_init_arm = std::unique_ptr<InitPoseParticlesSiamese>(new InitPoseParticlesSiamese("resampling-with-prior"));
+            resample_init = std::unique_ptr<InitPoseParticlesSiamese>(new InitPoseParticlesSiamese("resampling-with-prior"));
 
-        pf_resampling = std::unique_ptr<Resampling>(new ResamplingWithPrior(std::move(resample_init_arm), paramsd["prior_ratio"]));
+        pf_resampling = std::unique_ptr<Resampling>(new ResamplingWithPrior(std::move(resample_init), paramsd["prior_ratio"]));
     }
 
     /* PARTICLE FILTER */
@@ -384,10 +362,10 @@ int main(int argc, char *argv[])
                       paramsd["resample_ratio"],
                       rf.getContext());
 
+    yInfo() << log_ID << "Booting filter...";
 
     vsis_pf.boot();
     vsis_pf.wait();
-
 
     yInfo() << log_ID << "Application closed succesfully.";
     return EXIT_SUCCESS;
