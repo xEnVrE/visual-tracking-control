@@ -7,7 +7,7 @@
 #
 #===============================================================================
 
-set(EXE_TARGET_NAME hand-tracking)
+set(EXE_TARGET_NAME object-tracking-siamese)
 
 include(AddDependenciesPrintUtils)
 
@@ -361,6 +361,8 @@ set(${EXE_TARGET_NAME}_APP
 
 set(${EXE_TARGET_NAME}_CONF
       ${CMAKE_CURRENT_SOURCE_DIR}/conf/config.ini
+      ${CMAKE_CURRENT_SOURCE_DIR}/conf/realsense_camera_config.ini
+      ${CMAKE_CURRENT_SOURCE_DIR}/conf/realsense2_dev.ini
 )
 
 set(${EXE_TARGET_NAME}_SHADER_VERT
