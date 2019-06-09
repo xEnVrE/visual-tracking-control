@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
 
     // Added initialization for Siamese Model
     else if (paramss["robot"] == "siamese")
-        init_arm = std::unique_ptr<InitPoseParticlesSiamese>(new InitPoseParticlesSiamese());
+        init_arm = std::unique_ptr<InitPoseParticlesSiamese>(new InitPoseParticlesSiamese("siamese"));
 
 
     /* MOTION MODEL */
@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
         else if (paramss["robot"] == "walkman")
             resample_init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitWalkmanArm/" + paramss["cam_sel"]));
         else if (paramss["robot"] == "siamese")
-            resample_init_arm = std::unique_ptr<InitPoseParticlesSiamese>(new InitPoseParticlesSiamese());
+            resample_init_arm = std::unique_ptr<InitPoseParticlesSiamese>(new InitPoseParticlesSiamese("resampling-with-prior"));
 
         pf_resampling = std::unique_ptr<Resampling>(new ResamplingWithPrior(std::move(resample_init_arm), paramsd["prior_ratio"]));
     }
