@@ -379,7 +379,7 @@ int main(int argc, char *argv[])
                       paramss["cam_sel"],
                       paramsd["num_particles"],
                       paramsd["resample_ratio"],
-                      "handTracking/VisualSIS/" + paramss["cam_sel"]);
+                      "object-tracking-siamese");
 
 
     vsis_pf.boot();
