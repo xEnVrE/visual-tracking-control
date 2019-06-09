@@ -11,8 +11,15 @@ set(EXE_TARGET_NAME object-tracking-siamese)
 
 include(AddDependenciesPrintUtils)
 
-
 # Dependencies
+#find_package(SuperimposeMesh 0.10.0 QUIET)
+#if(NOT SuperimposeMesh_FOUND)
+#  message(STATUS "Did not found required master release of SuperimposeMesh. Looking for devel version.")
+#  find_package(SuperimposeMesh 0.11.100 REQUIRED)
+#endif()
+print_dependency(SuperimposeMesh)
+
+
 find_package(CUDA QUIET)
 print_dependency(CUDA)
 
@@ -44,14 +51,6 @@ if(NOT BayesFilters_FOUND)
   find_package(BayesFilters 0.9.100 REQUIRED)
 endif()
 print_dependency(BayesFilters)
-
-
-find_package(SuperimposeMesh 0.10.0 QUIET)
-if(NOT SuperimposeMesh_FOUND)
-  message(STATUS "Did not found required master release of SuperimposeMesh. Looking for devel version.")
-  find_package(SuperimposeMesh 0.11.100 REQUIRED)
-endif()
-print_dependency(SuperimposeMesh)
 
 
 list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
@@ -357,6 +356,7 @@ set(${EXE_TARGET_NAME}_APP
       ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-iCub-Batch.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-iCub-Sim.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/app/hand-tracking-Walkman-Batch.xml
+      ${CMAKE_CURRENT_SOURCE_DIR}/app/object-tracking-siamese.xml
 )
 
 set(${EXE_TARGET_NAME}_CONF
