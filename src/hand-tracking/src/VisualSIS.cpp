@@ -54,7 +54,7 @@ VisualSIS::VisualSIS
     cor_particle_(num_particles_, state_size_),
     estimate_extraction_(state_size_linear_, state_size_circular_)
 {
-    port_estimates_out_.open("/" + port_prefix_ + "/estimates:o");
+    port_estimates_out_.open("/" + port_prefix_ + "/estimate:o");
 
     //port_image_out_.open("/" + port_prefix_ + "/img:o");
 
