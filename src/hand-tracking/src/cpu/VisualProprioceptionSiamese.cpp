@@ -214,10 +214,8 @@ std::pair<bool, bfl::Data> VisualProprioceptionSiamese::predictedMeasure(const R
     }
 
     cv::Mat rendered_image;
-    bool success = false;
-    success &= rImpl.si_cad_->superimpose(model_poses, camera_position.data(), camera_orientation.data(), rendered_image);
-    if (!success)
-        return std::make_pair(false, rendered_image); // initialize with empty if rendering failed 
+    if (!(rImpl.si_cad_->superimpose(model_poses, camera_position.data(), camera_orientation.data(), rendered_image)))
+        return std::make_pair(false, rendered_image); // initialize with empty if rendering failed
 
     // return the rendered image
     return std::make_pair(true, std::move(rendered_image));
