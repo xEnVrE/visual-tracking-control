@@ -15,9 +15,9 @@ using namespace yarp::sig;
 using namespace yarp::eigen;
 
 
-InitPoseParticlesSiamese::InitPoseParticlesSiamese()
+InitPoseParticlesSiamese::InitPoseParticlesSiamese(const std::string& port_prefix)
 {
-    SiamesePort.open("/siamese/init_particles:i");
+    SiamesePort.open("/" + port_prefix + "/init_particles:i");
 }
 
 

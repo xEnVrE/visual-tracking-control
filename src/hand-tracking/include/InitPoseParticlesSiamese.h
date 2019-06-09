@@ -17,7 +17,7 @@
 class InitPoseParticlesSiamese : public InitPoseParticlesAxisAngle
 {
 public:
-    InitPoseParticlesSiamese();
+    InitPoseParticlesSiamese(const std::string& port_prefix);
 
     virtual ~InitPoseParticlesSiamese();
     
