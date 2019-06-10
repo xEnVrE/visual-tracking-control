@@ -25,7 +25,7 @@
 
   <module>
     <name>yarpview</name>
-    <parameters>--name /object-tracking/viewer/groundtruthImage:i</parameters>
+    <parameters>--name /object-tracking/viewer/groundTruthImage:i</parameters>
     <node>localhost</node>
     <prefix></prefix>
   </module>
@@ -75,7 +75,7 @@
 
   <connection>
     <from>/object-tracking-ground-truth/estimateMarkerImage:o</from>
-    <to>/object-tracking/viewer/rgbImage:i</to>
+    <to>/object-tracking/viewer/groundTruthImage:i</to>
     <protocol>mjpeg</protocol>
   </connection>
 
