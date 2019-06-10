@@ -186,6 +186,14 @@ std::pair<bool, bfl::Data> VisualProprioceptionSiamese::predictedMeasure(const R
 
     std::array<double, 3> camera_position;
     std::array<double, 4> camera_orientation;
+    camera_position[0] = 0.0;
+    camera_position[1] = 0.0;
+    camera_position[2] = 0.0;
+
+    camera_orientation[0] = 1.0;
+    camera_orientation[1] = 0.0;
+    camera_orientation[2] = 0.0;
+    camera_orientation[3] = 0.0;
 
     std::vector<Superimpose::ModelPoseContainer> model_poses(cur_states.cols());
     
