@@ -55,10 +55,10 @@ std::pair<bool, VectorXd> IoU::likelihood(const MeasurementModel& measurement_mo
     Data data_predicted_measurements;
     std::tie(valid_predicted_measurements, data_predicted_measurements) = measurement_model.predictedMeasure(pred_states);
 
-    cv::Mat predicted_measurements;
+    cv::Mat predicted_measurements = any::any_cast<cv::Mat>(data_predicted_measurements);
     try
     {
-        cv::cvtColor(any::any_cast<cv::Mat>(data_predicted_measurements), predicted_measurements, cv::COLOR_RGB2GRAY);
+        cv::cvtColor(predicted_measurements, predicted_measurements, cv::COLOR_RGB2GRAY);
     }
     catch(const any::bad_any_cast& e)
     {
