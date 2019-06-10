@@ -29,17 +29,15 @@ InitPoseParticlesSiamese::~InitPoseParticlesSiamese()
 
 Eigen::VectorXd InitPoseParticlesSiamese::readPoseAxisAngle()
 {
-    Vector *input = SiamesePort.read(true);
-    VectorXd Pose;
-    
-    if (input!=nullptr)
-    {
-        Pose = toEigen(*input);
-    }
-    else
-    {
-        throw(std::runtime_error("Particles initialization was not received!"));
-    }
+    VectorXd pose(7);
 
-    return Pose;
+    pose(0) = 0.00332970008243399;
+    pose(1) = 0.0480561846425669;
+    pose(2) = 0.470490887414952;
+    pose(3) = 0.110957019138624;
+    pose(4) = 0.851492242463462;
+    pose(5) = -0.512493415497619;
+    pose(6) = 2.92096676220956;
+
+    return pose;
 }

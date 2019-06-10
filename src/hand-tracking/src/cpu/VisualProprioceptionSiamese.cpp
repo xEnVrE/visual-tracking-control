@@ -103,7 +103,7 @@ VisualProprioceptionSiamese::VisualProprioceptionSiamese
         rf.setDefaultConfigFile("realsense_camera_config.ini");
         rf.configure(0, nullptr);
 
-        ResourceFinder rf_camera = rf.findNestedResourceFinder("camera_640_480");
+        ResourceFinder rf_camera = rf.findNestedResourceFinder("camera_320_240");
         rImpl.cam_params_.width = rf_camera.find("width").asDouble();
         rImpl.cam_params_.height = rf_camera.find("height").asDouble();
         rImpl.cam_params_.fx = rf_camera.find("fx").asDouble();

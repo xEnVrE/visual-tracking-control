@@ -12,6 +12,9 @@
 
 #include <memory>
 
+#include <yarp/os/BufferedPort.h>
+#include <yarp/sig/Image.h>
+
 
 class IoU : public bfl::LikelihoodModel
 {

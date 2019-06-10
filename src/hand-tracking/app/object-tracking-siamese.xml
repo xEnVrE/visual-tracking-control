@@ -45,6 +45,20 @@
   </module>
 
   <module>
+    <name>yarpview</name>
+    <parameters>--name /object-tracking/viewer/measureImage:i</parameters>
+    <node>localhost</node>
+    <prefix></prefix>
+  </module>
+
+  <module>
+    <name>yarpview</name>
+    <parameters>--name /object-tracking/viewer/predictedMeasureImage:i</parameters>
+    <node>localhost</node>
+    <prefix></prefix>
+  </module>
+
+  <module>
     <name>yarpdev</name>
     <parameters>--context object-tracking-siamese --from realsense2_dev.ini</parameters>
     <node>localhost</node>
@@ -138,6 +152,19 @@
   <connection>
     <from>/instanceSegmenter/maskImage:o</from>
     <to>/siamese/read_masks:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <!-- Debugging connections from the likelihood part  -->
+  <connection>
+    <from>/siamese/likelihood/measureImage:o</from>
+    <to>/object-tracking/viewer/measureImage:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <connection>
+    <from>/siamese/likelihood/predictedMeasureImage:o</from>
+    <to>/object-tracking/viewer/predictedMeasureImage:i</to>
     <protocol>tcp</protocol>
   </connection>
 

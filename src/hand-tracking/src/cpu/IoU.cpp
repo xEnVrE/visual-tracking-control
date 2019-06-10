@@ -16,6 +16,10 @@
 #include <yarp/cv/Cv.h>
 #include <yarp/sig/all.h>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 using namespace bfl;
 using namespace Eigen;
 using namespace yarp::cv;
@@ -26,6 +30,10 @@ using namespace yarp::sig;
 struct IoU::ImplData
 {
     double likelihood_gain_;
+
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelMono>> port_image_out_0_;
+
+    yarp::os::BufferedPort<yarp::sig::ImageOf<yarp::sig::PixelMono>> port_image_out_1_;
 };
 
 
@@ -33,10 +41,19 @@ IoU::IoU(const double likelihood_gain) noexcept :
     pImpl_(std::unique_ptr<ImplData>(new ImplData))
 {
     pImpl_->likelihood_gain_ = likelihood_gain;
+
+    pImpl_->port_image_out_0_.open("/siamese/likelihood/measureImage:o");
+
+    pImpl_->port_image_out_1_.open("/siamese/likelihood/predictedMeasureImage:o");
 }
 
 
-IoU::~IoU() = default;
+IoU::~IoU()
+{
+    pImpl_->port_image_out_0_.close();
+
+    pImpl_->port_image_out_1_.close();
+}
 
 
 std::pair<bool, VectorXd> IoU::likelihood(const MeasurementModel& measurement_model, const Ref<const MatrixXd>& pred_states)
@@ -50,6 +67,9 @@ std::pair<bool, VectorXd> IoU::likelihood(const MeasurementModel& measurement_mo
 
     ImageOf<PixelMono> measurements_mono = any::any_cast<ImageOf<PixelMono>>(data_measurements);
     cv::Mat measurements = toCvMat(measurements_mono);
+    ImageOf<PixelMono>& image0 = pImpl_->port_image_out_0_.prepare();
+    image0 = fromCvMat<PixelMono>(measurements);
+    pImpl_->port_image_out_0_.write();
 
     bool valid_predicted_measurements;
     Data data_predicted_measurements;
@@ -66,6 +86,9 @@ std::pair<bool, VectorXd> IoU::likelihood(const MeasurementModel& measurement_mo
 
         valid_predicted_measurements = false;
     }
+    ImageOf<PixelMono>& image1 = pImpl_->port_image_out_1_.prepare();
+    image1 = fromCvMat<PixelMono>(predicted_measurements);
+    pImpl_->port_image_out_1_.write();
 
     if (!valid_predicted_measurements)
         return std::make_pair(false, VectorXd::Zero(1));
