@@ -12,11 +12,11 @@ set(EXE_TARGET_NAME object-tracking-siamese)
 include(AddDependenciesPrintUtils)
 
 # Dependencies
-#find_package(SuperimposeMesh 0.10.0 QUIET)
-#if(NOT SuperimposeMesh_FOUND)
-#  message(STATUS "Did not found required master release of SuperimposeMesh. Looking for devel version.")
-#  find_package(SuperimposeMesh 0.11.100 REQUIRED)
-#endif()
+find_package(SuperimposeMesh 0.10.0 QUIET)
+if(NOT SuperimposeMesh_FOUND)
+  message(STATUS "Did not found required master release of SuperimposeMesh. Looking for devel version.")
+  find_package(SuperimposeMesh 0.11.100 REQUIRED)
+endif()
 print_dependency(SuperimposeMesh)
 
 
