@@ -115,7 +115,7 @@ VisualProprioceptionSiamese::VisualProprioceptionSiamese
     std::cout << "INFO::VISUALPROPRIOCEPTION::CTOR" << std::endl
               << "Camera intrinsic parameters are:" << std::endl
               << "- width:" << rImpl.cam_params_.width << std::endl
-              << "- height:" << rImpl.cam_params_.width << std::endl
+              << "- height:" << rImpl.cam_params_.height << std::endl
               << "- fx:" << rImpl.cam_params_.fx << std::endl
               << "- fy:" << rImpl.cam_params_.fy << std::endl
               << "- cx:" << rImpl.cam_params_.cx << std::endl
