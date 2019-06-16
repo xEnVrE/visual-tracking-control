@@ -79,7 +79,7 @@ void DrawParticlesImportanceThreshold::predictStep(const ParticleSet& prev_parti
         else
             tmp_state = prev_particles.state(j);
 
-        if (!getSkipState() && std::exp(prev_particles.weight(j)) <= threshold)
+        if (!getSkipState()) // && std::exp(prev_particles.weight(j)) <= threshold)
             state_model_->motion(tmp_state, pred_particles.state(j));
         else
             pred_particles.state(j) = tmp_state;
