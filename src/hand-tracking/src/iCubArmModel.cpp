@@ -236,42 +236,42 @@ std::tuple<bool, std::vector<Superimpose::ModelPoseContainer>> iCubArmModel::get
 
             Matrix Ha = axis2dcm(ee_o);
             Ha.setCol(3, ee_t);
-            for (unsigned int fng = (use_thumb_ ? 0 : 1); fng < 5; ++fng)
-            {
-                std::string finger_s;
-                pose.clear();
-                if (fng != 0)
-                {
-                    Vector j_x = (Ha * (icub_kin_finger_[fng].getH0().getCol(3))).subVector(0, 2);
-                    Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH0());
+            // for (unsigned int fng = (use_thumb_ ? 0 : 1); fng < 5; ++fng)
+            // {
+            //     std::string finger_s;
+            //     pose.clear();
+            //     if (fng != 0)
+            //     {
+            //         Vector j_x = (Ha * (icub_kin_finger_[fng].getH0().getCol(3))).subVector(0, 2);
+            //         Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH0());
 
-                    if (fng == 1) finger_s = "index0";
-                    else if (fng == 2) finger_s = "medium0";
-                    else if (fng == 3) finger_s = "ring0";
-                    else if (fng == 4) finger_s = "little0";
+            //         if (fng == 1) finger_s = "index0";
+            //         else if (fng == 2) finger_s = "medium0";
+            //         else if (fng == 3) finger_s = "ring0";
+            //         else if (fng == 4) finger_s = "little0";
 
-                    pose.assign(j_x.data(), j_x.data() + 3);
-                    pose.insert(pose.end(), j_o.data(), j_o.data() + 4);
-                    hand_pose.emplace(finger_s, pose);
-                }
+            //         pose.assign(j_x.data(), j_x.data() + 3);
+            //         pose.insert(pose.end(), j_o.data(), j_o.data() + 4);
+            //         hand_pose.emplace(finger_s, pose);
+            //     }
 
-                for (size_t i = 0; i < icub_kin_finger_[fng].getN(); ++i)
-                {
-                    Vector j_x = (Ha * (icub_kin_finger_[fng].getH(i, true).getCol(3))).subVector(0, 2);
-                    Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH(i, true));
+            //     for (size_t i = 0; i < icub_kin_finger_[fng].getN(); ++i)
+            //     {
+            //         Vector j_x = (Ha * (icub_kin_finger_[fng].getH(i, true).getCol(3))).subVector(0, 2);
+            //         Vector j_o = dcm2axis(Ha * icub_kin_finger_[fng].getH(i, true));
 
-                    if (fng == 0) finger_s = "thumb";
-                    else if (fng == 1) finger_s = "index";
-                    else if (fng == 2) finger_s = "medium";
-                    else if (fng == 3) finger_s = "ring";
-                    else if (fng == 4) finger_s = "little";
-                    finger_s += std::to_string(i + 1);
+            //         if (fng == 0) finger_s = "thumb";
+            //         else if (fng == 1) finger_s = "index";
+            //         else if (fng == 2) finger_s = "medium";
+            //         else if (fng == 3) finger_s = "ring";
+            //         else if (fng == 4) finger_s = "little";
+            //         finger_s += std::to_string(i + 1);
 
-                    pose.assign(j_x.data(), j_x.data() + 3);
-                    pose.insert(pose.end(), j_o.data(), j_o.data() + 4);
-                    hand_pose.emplace(finger_s, pose);
-                }
-            }
+            //         pose.assign(j_x.data(), j_x.data() + 3);
+            //         pose.insert(pose.end(), j_o.data(), j_o.data() + 4);
+            //         hand_pose.emplace(finger_s, pose);
+            //     }
+            // }
             if (use_forearm_)
             {
                 yarp::sig::Matrix invH6 = Ha *
