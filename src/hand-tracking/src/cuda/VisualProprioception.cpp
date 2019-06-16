@@ -6,6 +6,7 @@
  */
 
 #include <VisualProprioception.h>
+#include <utils.h>
 
 #include <array>
 #include <cmath>
@@ -29,7 +30,7 @@
 using namespace Eigen;
 using namespace yarp::sig;
 using namespace yarp::cv;
-
+using namespace hand_tracking::utils;
 
 struct VisualProprioception::ImplData
 {
@@ -182,7 +183,24 @@ std::pair<bool, bfl::Data> VisualProprioception::predictedMeasure(const Ref<cons
     std::vector<Superimpose::ModelPoseContainer> mesh_poses;
     bool success = false;
 
-    std::tie(success, mesh_poses) = rImpl.mesh_model_->getModelPose(cur_states);
+    // express all the poses of interest in robot frame
+    Transform<double, 3, Affine> camera_pose;
+    camera_pose = Translation<double, 3>(Vector3d(camera_position.data()));
+    camera_pose.rotate(AngleAxisd(camera_orientation[3], Vector3d(camera_orientation.data())));
+    MatrixXd rotated_states(cur_states.rows(), cur_states.cols());
+    for (std::size_t i = 0; i < cur_states.cols(); i++)
+    {
+        Transform<double, 3, Affine> particle_pose;
+	particle_pose = Translation<double, 3>(cur_states.col(i).head<3>());
+	VectorXd rotation = euler_to_axis_angle(cur_states.col(i).tail<3>(), AxisOfRotation::UnitZ, AxisOfRotation::UnitY, AxisOfRotation::UnitX);
+	AngleAxisd angle_axis(rotation(3), rotation.head<3>());
+	particle_pose.rotate(angle_axis);
+	auto rotated_state = camera_pose * particle_pose;
+	rotated_states.col(i).head<3>() = rotated_state.translation();
+	rotated_states.col(i).tail<3>() = rotated_state.rotation().eulerAngles(2, 1, 0);
+    }
+
+    std::tie(success, mesh_poses) = rImpl.mesh_model_->getModelPose(rotated_states);
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
 
