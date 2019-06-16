@@ -10,6 +10,8 @@
 
 #include <BayesFilters/ExogenousModel.h>
 
+#include <Eigen/Dense>
+
 #include <yarp/dev/PolyDriver.h>
 #include <yarp/dev/IEncoders.h>
 #include <yarp/sig/Vector.h>
@@ -18,6 +20,8 @@
 class KinPoseModel : public bfl::ExogenousModel
 {
 public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     KinPoseModel() noexcept;
 
     ~KinPoseModel() noexcept;
@@ -37,16 +41,10 @@ protected:
 
     bool setDeltaMotion();
 
-    Eigen::Matrix3d relativeOrientation(const Eigen::Ref<const Eigen::VectorXd>& prev_pose, const Eigen::Ref<Eigen::VectorXd>& curr_pose);
-
-    Eigen::MatrixXd perturbOrientation(const Eigen::Ref<const Eigen::MatrixXd>& state, const Eigen::Ref<const Eigen::MatrixXd>& perturbation);
-
 private:
     Eigen::VectorXd prev_ee_pose_ = Eigen::VectorXd::Zero(6);
 
-    Eigen::Vector3d delta_hand_pos_ = Eigen::Vector3d::Zero();
-
-    Eigen::Matrix3d delta_hand_rot_ = Eigen::Matrix3d::Zero();
+    Eigen::Transform<double, 3, Eigen::Affine> relative_pose_ = Eigen::Transform<double, 3, Eigen::Affine>::Identity();
 };
 
 #endif /* FWDPOSEMODEL_H */

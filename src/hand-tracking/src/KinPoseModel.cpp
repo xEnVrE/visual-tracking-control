@@ -36,8 +36,17 @@ KinPoseModel::~KinPoseModel() noexcept
 
 void KinPoseModel::propagate(const Ref<const MatrixXd>& cur_state, Ref<MatrixXd> prop_state)
 {
-    prop_state.topRows<3>() = cur_state.topRows<3>().colwise() + delta_hand_pos_;
-    prop_state.bottomRows<3>() = perturbOrientation(cur_state.bottomRows<3>(), delta_hand_rot_);
+    for (std::size_t i = 0; i < cur_state.cols(); i++)
+    {
+        Transform<double, 3, Affine> pose;
+	pose = Translation<double, 3>(cur_state.col(i).head<3>());
+	pose.rotate(AngleAxisd(cur_state.col(i)(3), Vector3d::UnitZ()) *
+		    AngleAxisd(cur_state.col(i)(4), Vector3d::UnitY()) *
+		    AngleAxisd(cur_state.col(i)(5), Vector3d::UnitX()));
+	auto transformed = pose * relative_pose_;
+	prop_state.col(i).head<3>() = transformed.translation();
+	prop_state.col(i).tail<3>() = transformed.rotation().eulerAngles(2, 1, 0);
+    }
 }
 
 
@@ -77,65 +86,27 @@ bool KinPoseModel::setDeltaMotion()
 
     if (!initialize_delta_)
     {
-        delta_hand_pos_ = ee_pose.head<3>() - prev_ee_pose_.head<3>();
+        Transform<double, 3, Affine> prev_pose;
+	prev_pose = Translation<double, 3>(prev_ee_pose_.head<3>());
+	prev_pose.rotate(AngleAxisd(prev_ee_pose_(3), Vector3d::UnitZ()) *
+			 AngleAxisd(prev_ee_pose_(4), Vector3d::UnitY()) *
+			 AngleAxisd(prev_ee_pose_(5), Vector3d::UnitX()));
 
-        delta_hand_rot_.noalias() = relativeOrientation(prev_ee_pose_, ee_pose);
+	Transform<double, 3, Affine> pose;
+	pose = Translation<double, 3>(ee_pose.head<3>());
+	pose.rotate(AngleAxisd(ee_pose(3), Vector3d::UnitZ()) *
+		    AngleAxisd(ee_pose(4), Vector3d::UnitY()) *
+		    AngleAxisd(ee_pose(5), Vector3d::UnitX()));
+
+	relative_pose_ = prev_pose.inverse() * pose;
     }
     else
     {
-        delta_hand_pos_  = VectorXd::Zero(3);
-        delta_hand_rot_   = Matrix3d::Identity();
+        relative_pose_ = Transform<double, 3, Affine>::Identity();
         initialize_delta_ = false;
     }
 
     prev_ee_pose_ = ee_pose;
 
     return true;
-}
-
-
-Matrix3d KinPoseModel::relativeOrientation(const Ref<const VectorXd>& prev_pose, const Ref<VectorXd>& curr_pose)
-{
-    /*
-     * Evaluate rotation matrix due to previous pose.
-     */
-    Matrix3d prev_rot = (AngleAxisd(prev_pose(3), Vector3d::UnitZ())
-                       * AngleAxisd(prev_pose(4), Vector3d::UnitY())
-                       * AngleAxisd(prev_pose(5), Vector3d::UnitX())).toRotationMatrix();
-
-    // Evaluate rotation matrix due to previous pose
-    Matrix3d curr_rot = (AngleAxisd(curr_pose(3), Vector3d::UnitZ())
-                       * AngleAxisd(curr_pose(4), Vector3d::UnitY())
-                       * AngleAxisd(curr_pose(5), Vector3d::UnitX())).toRotationMatrix();
-
-    // Evaluate relative rotation R s.t. current_rot = previous_rot * R;
-    return prev_rot.transpose() * curr_rot;
-}
-
-
-MatrixXd KinPoseModel::perturbOrientation(const Ref<const MatrixXd>& state, const Ref<const MatrixXd>& perturbation)
-{
-    MatrixXd perturbed_orientations(3, state.cols());
-
-    /*
-     * Evaluate rotation matrix due to current pose.
-     */
-    for (int i = 0; i < state.cols(); i++)
-    {
-        Matrix3d state_rot = (AngleAxisd(state(0, i), Vector3d::UnitZ())
-                            * AngleAxisd(state(1, i), Vector3d::UnitY())
-                            * AngleAxisd(state(2, i), Vector3d::UnitX())).toRotationMatrix();
-
-        /*
-         * Perturb rotation using the evaluated relative rotation.
-         */
-        Matrix3d perturbed_rot = state_rot * perturbation;
-
-        /*
-         * Extract ZYX Euler angles.
-         */
-        perturbed_orientations.col(i) = perturbed_rot.eulerAngles(2, 1, 0);
-    }
-
-    return perturbed_orientations;
 }
