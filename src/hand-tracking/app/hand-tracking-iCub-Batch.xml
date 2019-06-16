@@ -31,6 +31,12 @@
     <node>localhost</node>
   </module>
 
+  <module>
+    <name>yarpview</name>
+    <parameters>--name /handTracking/viewer/rendered:i</parameters>
+    <node>localhost</node>
+  </module>
+
 
   <!-- REQUIRED CONNECTIONS -->
   <!-- Particle filter connections -->
@@ -132,6 +138,14 @@
     <to>/handTracking/MeshModel/iCubArmModel/right/torso:i</to>
     <protocol>fast_tcp</protocol>
   </connection>
+
+
+<connection>
+    <from>/handTracking/VisualSIS/rendered:o</from>
+    <to>/handTracking/viewer/rendered:i</to>
+    <protocol>fast_tcp</protocol>
+  </connection>
+
 
   <!-- ResamplingWithPrior connections -->
   <connection>
