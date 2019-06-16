@@ -161,7 +161,22 @@ void BrownianMotionPose::motion(const Eigen::Ref<const Eigen::MatrixXd>& cur_sta
     sample = getNoiseSample(mot_state.cols());
 
     mot_state.topRows<3>() += sample.topRows<3>();
-    mot_state.bottomRows<3>() = directional_statistics::directional_add(mot_state.bottomRows<3>(), sample.bottomRows<3>());
+
+    for (std::size_t i = 0; i < cur_state.cols(); i++)
+    {
+        Transform<double, 3, Affine> transform;
+        transform = Translation<double, 3>(cur_state.col(i).head<3>());
+	transform.rotate(AngleAxisd(cur_state.col(i)(3), Vector3d::UnitZ()) *
+			 AngleAxisd(cur_state.col(i)(4), Vector3d::UnitY()) *
+			 AngleAxisd(cur_state.col(i)(5), Vector3d::UnitX()));
+	auto rotation_noise = AngleAxisd(sample.col(i)(3), Vector3d::UnitZ()) *
+	                      AngleAxisd(sample.col(i)(4), Vector3d::UnitY()) *
+	                      AngleAxisd(sample.col(i)(5), Vector3d::UnitX());
+	transform.rotate(rotation_noise);
+	mot_state.col(i).tail<3>() = transform.rotation().eulerAngles(2, 1, 0);
+    }
+
+    // mot_state.bottomRows<3>() = directional_statistics::directional_add(mot_state.bottomRows<3>(), sample.bottomRows<3>());
 }
 
 
