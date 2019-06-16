@@ -9,11 +9,14 @@
 #define INITPOSEPARTICLESAXISANGLE_H
 
 #include <InitPoseParticles.h>
+#include <Camera.h>
 
 
 class InitPoseParticlesAxisAngle : public InitPoseParticles
 {
 public:
+    InitPoseParticlesAxisAngle(std::unique_ptr<bfl::Camera> camera) noexcept;
+
     virtual ~InitPoseParticlesAxisAngle() noexcept;
 
 protected:

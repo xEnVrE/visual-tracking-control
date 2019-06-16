@@ -12,6 +12,7 @@
 #include <yarp/eigen/Eigen.h>
 
 using namespace Eigen;
+using namespace bfl;
 using namespace iCub::iKin;
 using namespace iCub::ctrl;
 using namespace yarp::eigen;
@@ -20,7 +21,8 @@ using namespace yarp::sig;
 using namespace yarp::os;
 
 
-InitiCubArm::InitiCubArm(const std::string& laterality, const std::string& port_prefix) noexcept :
+InitiCubArm::InitiCubArm(const std::string& laterality, const std::string& port_prefix, std::unique_ptr<Camera> camera) noexcept :
+    InitPoseParticlesAxisAngle(std::move(camera)),
     port_prefix_(port_prefix),
     icub_kin_arm_(iCubArm(laterality + "_v2"))
 {
@@ -34,8 +36,8 @@ InitiCubArm::InitiCubArm(const std::string& laterality, const std::string& port_
 }
 
 
-InitiCubArm::InitiCubArm(const std::string& laterality) noexcept :
-    InitiCubArm("InitiCubArm", laterality) { }
+// InitiCubArm::InitiCubArm(const std::string& laterality) noexcept :
+//     InitiCubArm("InitiCubArm", laterality) { }
 
 
 InitiCubArm::~InitiCubArm() noexcept

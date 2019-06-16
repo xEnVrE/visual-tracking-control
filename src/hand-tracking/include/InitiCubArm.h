@@ -9,6 +9,7 @@
 #define INITICUBARM_H
 
 #include <InitPoseParticlesAxisAngle.h>
+#include <Camera.h>
 
 #include <iCub/iKin/iKinFwd.h>
 
@@ -22,9 +23,9 @@
 class InitiCubArm : public InitPoseParticlesAxisAngle
 {
 public:
-    InitiCubArm(const std::string& laterality, const std::string& port_prefix) noexcept;
+    InitiCubArm(const std::string& laterality, const std::string& port_prefix, std::unique_ptr<bfl::Camera> camera) noexcept;
 
-    InitiCubArm(const std::string& laterality) noexcept;
+    /* InitiCubArm(const std::string& laterality) noexcept; */
 
     ~InitiCubArm() noexcept;
 

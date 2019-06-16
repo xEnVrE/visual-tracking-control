@@ -34,7 +34,7 @@
 #include <iCubGatePose.h>
 #include <iCubFwdKinModel.h>
 #include <InitiCubArm.h>
-#include <InitWalkmanArm.h>
+// #include <InitWalkmanArm.h>
 #include <KLD.h>
 #include <PlayiCubFwdKinModel.h>
 #include <PlayWalkmanPoseModel.h>
@@ -185,10 +185,14 @@ int main(int argc, char *argv[])
 
     /* INITIALIZATION */
     std::unique_ptr<ParticleSetInitialization> init_arm;
-    if (paramss["robot"] == "icub")
-        init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["laterality"], "handTracking/InitiCubArm/" + paramss["cam_sel"]));
-    else if (paramss["robot"] == "walkman")
-        init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["laterality"], "handTracking/InitWalkmanArm/" + paramss["cam_sel"]));
+    std::unique_ptr<Camera> camera_init = std::unique_ptr<Camera>(new iCubCamera(paramss["cam_sel"],
+										 paramsd["resolution_ratio"],
+										 rf.getContext(),
+										 "handTracking/InitiCubArm/iCubCamera/" + paramss["cam_sel"]));
+    // if (paramss["robot"] == "icub")
+    init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["laterality"], "handTracking/InitiCubArm/" + paramss["cam_sel"], std::move(camera_init)));
+    // else if (paramss["robot"] == "walkman")
+    //     init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["laterality"], "handTracking/InitWalkmanArm/" + paramss["cam_sel"]));
 
 
     /* MOTION MODEL */
@@ -334,19 +338,19 @@ int main(int argc, char *argv[])
 
     /* RESAMPLING */
     std::unique_ptr<Resampling> pf_resampling;
-    if (paramsd["resample_prior"] != 1.0)
-        pf_resampling = std::unique_ptr<Resampling>(new Resampling());
-    else
-    {
-        std::unique_ptr<ParticleSetInitialization> resample_init_arm;
+    // if (paramsd["resample_prior"] != 1.0)
+    pf_resampling = std::unique_ptr<Resampling>(new Resampling());
+    // else
+    // {
+    //     std::unique_ptr<ParticleSetInitialization> resample_init_arm;
 
-        if (paramss["robot"] == "icub")
-            resample_init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitiCubArm/" + paramss["cam_sel"]));
-        else if (paramss["robot"] == "walkman")
-            resample_init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitWalkmanArm/" + paramss["cam_sel"]));
+    //     if (paramss["robot"] == "icub")
+    //         resample_init_arm = std::unique_ptr<InitiCubArm>(new InitiCubArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitiCubArm/" + paramss["cam_sel"]));
+    //     else if (paramss["robot"] == "walkman")
+    //         resample_init_arm = std::unique_ptr<InitWalkmanArm>(new InitWalkmanArm(paramss["laterality"], "handTracking/ResamplingWithPrior/InitWalkmanArm/" + paramss["cam_sel"]));
 
-        pf_resampling = std::unique_ptr<Resampling>(new ResamplingWithPrior(std::move(resample_init_arm), paramsd["prior_ratio"]));
-    }
+    //     pf_resampling = std::unique_ptr<Resampling>(new ResamplingWithPrior(std::move(resample_init_arm), paramsd["prior_ratio"]));
+    // }
 
     /* PARTICLE FILTER */
     VisualSIS vsis_pf(std::move(init_arm),

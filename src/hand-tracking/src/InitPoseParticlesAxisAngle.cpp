@@ -9,10 +9,18 @@
 #include <utils.h>
 
 using namespace Eigen;
+using namespace bfl;
 using namespace hand_tracking::utils;
+
+
+InitPoseParticlesAxisAngle::InitPoseParticlesAxisAngle(std::unique_ptr<Camera> camera) noexcept :
+  InitPoseParticles(std::move(camera))
+{ }
+
 
 InitPoseParticlesAxisAngle::~InitPoseParticlesAxisAngle()
 { }
+
 
 Eigen::VectorXd InitPoseParticlesAxisAngle::readPose()
 {

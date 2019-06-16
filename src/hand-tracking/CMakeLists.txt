@@ -149,7 +149,7 @@ set(${EXE_TARGET_NAME}_HDR
       include/InitiCubArm.h
       include/InitPoseParticles.h
       include/InitPoseParticlesAxisAngle.h
-      include/InitWalkmanArm.h
+      # include/InitWalkmanArm.h
       include/KLD.h
       include/MeshModel.h
       include/NormOne.h
@@ -181,7 +181,7 @@ set(${EXE_TARGET_NAME}_SRC
       src/InitiCubArm.cpp
       src/InitPoseParticles.cpp
       src/InitPoseParticlesAxisAngle.cpp
-      src/InitWalkmanArm.cpp
+      # src/InitWalkmanArm.cpp
       src/PlayiCubFwdKinModel.cpp
       src/PlayGatePose.cpp
       src/PlayWalkmanPoseModel.cpp
