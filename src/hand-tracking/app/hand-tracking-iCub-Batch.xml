@@ -77,6 +77,42 @@
     <protocol>fast_tcp</protocol>
   </connection>
 
+  <connection>
+    <from>/icub/head/state:o</from>
+    <to>/handTracking/InitiCubArm/iCubCamera/left/head:i</to>
+    <protocol>fast_tcp</protocol>
+  </connection>
+
+  <connection>
+    <from>/icub/head/state:o</from>
+    <to>/handTracking/InitiCubArm/iCubCamera/right/head:i</to>
+    <protocol>fast_tcp</protocol>
+  </connection>
+
+  <connection>
+    <from>/icub/torso/state:o</from>
+    <to>/handTracking/InitiCubArm/iCubCamera/left/torso:i</to>
+    <protocol>fast_tcp</protocol>
+  </connection>
+
+  <connection>
+    <from>/icub/torso/state:o</from>
+    <to>/handTracking/InitiCubArm/iCubCamera/right/torso:i</to>
+    <protocol>fast_tcp</protocol>
+  </connection>
+
+  <connection>
+    <from>/icub/camcalib/left/out</from>
+    <to>/handTracking/InitiCubArm/iCubCamera/left/img:i</to>
+    <protocol>fast_tcp</protocol>
+  </connection>
+
+  <connection>
+    <from>/icub/camcalib/right/out</from>
+    <to>/handTracking/InitiCubArm/iCubCamera/right/img:i</to>
+    <protocol>fast_tcp</protocol>
+  </connection>
+
   <!-- Motion model connections -->
   <connection>
     <from>/icub/torso/state:o</from>
