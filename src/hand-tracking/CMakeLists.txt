@@ -152,6 +152,7 @@ set(${EXE_TARGET_NAME}_HDR
       include/InitPoseParticlesSiamese.h
       include/InitWalkmanArm.h
       include/IoU.h
+      include/IoU_depth.h
       include/KLD.h
       include/MeshModel.h
       include/NormOne.h
@@ -162,6 +163,7 @@ set(${EXE_TARGET_NAME}_HDR
       include/PlayiCubFwdKinModel.h
       include/PlayGatePose.h
       include/PlayWalkmanPoseModel.h
+      include/ReceiveDepth.h
       include/ReceiveMasks.h
       include/VisualProprioception.h
       include/VisualProprioceptionSiamese.h
@@ -191,6 +193,7 @@ set(${EXE_TARGET_NAME}_SRC
       src/PlayiCubFwdKinModel.cpp
       src/PlayGatePose.cpp
       src/PlayWalkmanPoseModel.cpp
+      src/ReceiveDepth.cpp
       src/ReceiveMasks.cpp
       src/SiameseMain.cpp
       src/VisualSIS.cpp
@@ -202,6 +205,7 @@ set(${EXE_TARGET_NAME}_SRC
 set(${EXE_TARGET_NAME}_CPU_SRC
       src/cpu/ChiSquare.cpp
       src/cpu/IoU.cpp
+      src/cpu/IoU_depth.cpp
       src/cpu/KLD.cpp
       src/cpu/NormOne.cpp
       src/cpu/NormTwo.cpp

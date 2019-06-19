@@ -7,6 +7,7 @@
 
 #include <VisualProprioceptionSiamese.h>
 #include <ReceiveMasks.h>
+#include <ReceiveDepth.h>
 #include <utils.h>
 
 #include <array>
@@ -33,7 +34,9 @@ struct VisualProprioceptionSiamese::ImplData
 {
     const std::string log_ID_ = "[VisualProprioceptionSiamese]";
 
-    std::unique_ptr<ReceiveMasks> receive_masks_ = nullptr; 
+    std::unique_ptr<ReceiveMasks> receive_masks_ = nullptr;
+
+    std::unique_ptr<ReceiveDepth> receive_depth_ = nullptr; 
 
     bfl::Camera::CameraIntrinsics cam_params_;
 
@@ -46,12 +49,15 @@ struct VisualProprioceptionSiamese::ImplData
     int num_images_;
 
     yarp::sig::ImageOf<yarp::sig::PixelMono> mask_;
+
+    yarp::sig::ImageOf<yarp::sig::PixelFloat> depth_map_;
 };
 
 
 VisualProprioceptionSiamese::VisualProprioceptionSiamese
 (
     std::unique_ptr<ReceiveMasks> receive_masks,
+    std::unique_ptr<ReceiveDepth> receive_depth,
     const int num_requested_images,
     const std::string& object_name,
     const std::string& context
@@ -61,6 +67,8 @@ VisualProprioceptionSiamese::VisualProprioceptionSiamese
     ImplData& rImpl = *pImpl_;
 
     rImpl.receive_masks_ = std::move(receive_masks);
+
+    rImpl.receive_depth_ = std::move(receive_depth);
 
     // Get camera intrinsic parameters
     Property properties;
@@ -176,7 +184,8 @@ VisualProprioceptionSiamese::~VisualProprioceptionSiamese()
 
 std::pair<bool, bfl::Data> VisualProprioceptionSiamese::measure(const bfl::Data& data) const
 {
-    return std::make_pair(true, std::move(pImpl_->mask_));
+    std::pair<yarp::sig::ImageOf<yarp::sig::PixelMono>,yarp::sig::ImageOf<yarp::sig::PixelFloat>> measure_pair = std::make_pair(std::move(pImpl_->mask_),std::move(pImpl_->depth_map_));
+    return std::make_pair(true, measure_pair);
 }
 
 
@@ -222,11 +231,15 @@ std::pair<bool, bfl::Data> VisualProprioceptionSiamese::predictedMeasure(const R
     }
 
     cv::Mat rendered_image;
-    if (!(rImpl.si_cad_->superimpose(model_poses, camera_position.data(), camera_orientation.data(), rendered_image)))
-        return std::make_pair(false, rendered_image); // initialize with empty if rendering failed
-
-    // return the rendered image
-    return std::make_pair(true, std::move(rendered_image));
+    cv::Mat rendered_depth;
+    if (!(rImpl.si_cad_->superimpose(model_poses, camera_position.data(), camera_orientation.data(), rendered_image, rendered_depth)))
+        {
+            std::pair<cv::Mat,cv::Mat> rendered_pair = std::make_pair(std::move(rendered_image),std::move(rendered_depth));
+            return std::make_pair(false, rendered_pair); // initialize with empty if rendering failed
+        }
+    // return the rendered pair
+    std::pair<cv::Mat,cv::Mat> rendered_pair = std::make_pair(std::move(rendered_image),std::move(rendered_depth));
+    return std::make_pair(true, rendered_pair);
 }
 
 
@@ -243,6 +256,8 @@ bool VisualProprioceptionSiamese::freeze()
     ImplData& rImpl = *pImpl_;
 
     rImpl.mask_ = bfl::any::any_cast<yarp::sig::ImageOf<yarp::sig::PixelMono>>(rImpl.receive_masks_->GetMask());
+
+    rImpl.depth_map_ = bfl::any::any_cast<yarp::sig::ImageOf<yarp::sig::PixelFloat>>(rImpl.receive_depth_->GetDepth());
 
     return true;
 }

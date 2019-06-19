@@ -32,6 +32,7 @@
 #include <InitPoseParticlesSiamese.h>
 #include <InitWalkmanArm.h>
 #include <IoU.h>
+#include <IoU_depth.h>
 #include <KLD.h>
 #include <NormOne.h>
 #include <NormTwo.h>
@@ -42,6 +43,7 @@
 #include <PlayWalkmanPoseModel.h>
 #include <PlayGatePose.h>
 #include <ReceiveMasks.h>
+#include <ReceiveDepth.h>
 #include <VisualProprioception.h>
 #include <VisualProprioceptionSiamese.h>
 #include <VisualSIS.h>
@@ -246,6 +248,7 @@ int main(int argc, char *argv[])
     std::unique_ptr<Camera> camera;
     std::unique_ptr<MeshModel> mesh_model;
     std::unique_ptr<ReceiveMasks> receive_masks;
+    std::unique_ptr<ReceiveDepth> receive_depth;
     if (paramss["robot"] == "icub")
     {
         camera = std::unique_ptr<Camera>(new iCubCamera(paramss["cam_sel"],
@@ -274,6 +277,8 @@ int main(int argc, char *argv[])
     {
         // Added arguments to VisualProprioceptionSiamese
         receive_masks = std::unique_ptr<ReceiveMasks>(new ReceiveMasks());
+
+        receive_depth = std::unique_ptr<ReceiveDepth>(new ReceiveDepth());
     }
     else
     {
@@ -286,6 +291,7 @@ int main(int argc, char *argv[])
     try
     {
         proprio = std::unique_ptr<VisualProprioceptionSiamese>(new VisualProprioceptionSiamese(std::move(receive_masks),
+                                                                                               std::move(receive_depth),
                                                                                                paramsd["num_images"],
                                                                                                paramss["object_name"],
                                                                                                rf.getContext()));
@@ -309,6 +315,8 @@ int main(int argc, char *argv[])
         likelihood = std::unique_ptr<ChiSquare>(new ChiSquare(paramsd["likelihood_gain"], 36));
     else if (paramss["likelihood_type"] == "iou")
         likelihood = std::unique_ptr<IoU>(new IoU(paramsd["likelihood_gain"]));
+    else if (paramss["likelihood_type"] == "iou_depth")
+        likelihood = std::unique_ptr<IoU_depth>(new IoU_depth(paramsd["likelihood_gain"]));
     else if (paramss["likelihood_type"] == "kld")
         likelihood = std::unique_ptr<KLD>(new KLD(paramsd["likelihood_gain"], 36));
     else if (paramss["likelihood_type"] == "norm_one")

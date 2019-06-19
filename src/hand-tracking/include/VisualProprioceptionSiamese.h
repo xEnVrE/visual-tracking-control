@@ -10,6 +10,7 @@
 
 #include <BayesFilters/MeasurementModel.h>
 #include <ReceiveMasks.h>
+#include <ReceiveDepth.h>
 
 #include <Camera.h>
 #include <MeshModel.h>
@@ -26,7 +27,7 @@
 class VisualProprioceptionSiamese : public bfl::MeasurementModel
 {
 public:
-    VisualProprioceptionSiamese(std::unique_ptr<ReceiveMasks> receive_masks, const int num_requested_images, const std::string& object_name, const std::string& context);
+    VisualProprioceptionSiamese(std::unique_ptr<ReceiveMasks> receive_masks, std::unique_ptr<ReceiveDepth> receive_depth, const int num_requested_images, const std::string& object_name, const std::string& context);
 
     virtual ~VisualProprioceptionSiamese() noexcept;
 

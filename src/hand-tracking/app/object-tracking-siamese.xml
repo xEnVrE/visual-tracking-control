@@ -45,10 +45,12 @@
   </module>
 
   <module>
-    <name>yarpdev</name>
-    <parameters>--context object-tracking-siamese --from realsense2_dev.ini</parameters>
+    <name>yarpview</name>
+    <parameters>--name /object-tracking/viewer/depthImage:i</parameters>
     <node>localhost</node>
+    <prefix></prefix>
   </module>
+
 
   <!-- CONNECTIONS -->
 
@@ -140,5 +142,20 @@
     <to>/siamese/read_masks:i</to>
     <protocol>tcp</protocol>
   </connection>
+
+  <!-- Siamese network to mask reception part  -->
+  <connection>
+    <from>/depthCamera/depthImage:o</from>
+    <to>/siamese/receive_depth:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
+  <!-- Camera depth to Viewer -->
+  <connection>
+    <from>/depthCamera/depthImage:o</from>
+    <to>/object-tracking/viewer/depthImage:i</to>
+    <protocol>tcp</protocol>
+  </connection>
+
 
 </application>
