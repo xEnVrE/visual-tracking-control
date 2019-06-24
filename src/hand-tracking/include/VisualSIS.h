@@ -41,7 +41,7 @@ class VisualSIS: public bfl::ParticleFilter,
                  public VisualSISParticleFilterIDL
 {
 public:
-    VisualSIS(std::unique_ptr<bfl::ParticleSetInitialization> initialization, std::unique_ptr<bfl::PFPrediction> prediction, std::unique_ptr<bfl::PFCorrection> correction, std::unique_ptr<bfl::Resampling> resampling, const std::string& cam_sel, const int num_particles, const double resample_ratio, const std::string& port_prefix);
+    VisualSIS(std::unique_ptr<bfl::ParticleSetInitialization> initialization, std::unique_ptr<bfl::PFPrediction> prediction, std::unique_ptr<bfl::PFCorrection> correction, std::unique_ptr<bfl::Resampling> resampling, const std::string& cam_sel, const int num_particles, const double resample_ratio, const std::string extraction_mode, const std::size_t extraction_window, const std::string& port_prefix);
 
     ~VisualSIS() noexcept;
 

@@ -74,12 +74,14 @@ int main(int argc, char *argv[])
 
     /* Get Particle Filter parameters */
     yarp::os::Bottle bottle_pf_params = rf.findGroup("PF");
-    paramsd["num_particles"]    = bottle_pf_params.check("num_particles",    Value(50)).asInt();
-    paramsd["gpu_count"]        = bottle_pf_params.check("gpu_count",        Value(1.0)).asInt();
-    paramsd["resample_prior"]   = bottle_pf_params.check("resample_prior",   Value(1.0)).asInt();
-    paramsd["gate_pose"]        = bottle_pf_params.check("gate_pose",        Value(0.0)).asInt();
-    paramsd["resolution_ratio"] = bottle_pf_params.check("resolution_ratio", Value(1.0)).asInt();
-    paramss["laterality"]       = bottle_pf_params.check("laterality",       Value("right")).asString();
+    paramsd["num_particles"]     = bottle_pf_params.check("num_particles",    Value(50)).asInt();
+    paramsd["gpu_count"]         = bottle_pf_params.check("gpu_count",        Value(1.0)).asInt();
+    paramsd["resample_prior"]    = bottle_pf_params.check("resample_prior",   Value(1.0)).asInt();
+    paramsd["gate_pose"]         = bottle_pf_params.check("gate_pose",        Value(0.0)).asInt();
+    paramsd["resolution_ratio"]  = bottle_pf_params.check("resolution_ratio", Value(1.0)).asInt();
+    paramss["laterality"]        = bottle_pf_params.check("laterality",       Value("right")).asString();
+    paramsd["extraction_window"] = bottle_pf_params.check("extraction_window", Value(5.0)).asInt();
+    paramss["extraction_mode"]   = bottle_pf_params.check("extraction_mode", Value("emode")).asString();
 
     paramsd["num_images"]       = paramsd["num_particles"] / paramsd["gpu_count"];
 
@@ -137,15 +139,17 @@ int main(int argc, char *argv[])
 
     /* Log parameters */
     yInfo() << log_ID << "General PF parameters:";
-    yInfo() << log_ID << " - robot:"          << paramss["robot"];
-    yInfo() << log_ID << " - cam_sel:"        << paramss["cam_sel"];
-    yInfo() << log_ID << " - laterality:"     << paramss["laterality"];
-    yInfo() << log_ID << " - num_particles:"  << paramsd["num_particles"];
-    yInfo() << log_ID << " - gpu_count:"      << paramsd["gpu_count"];
-    yInfo() << log_ID << " - num_images:"     << paramsd["num_images"];
-    yInfo() << log_ID << " - resample_prior:" << paramsd["resample_prior"];
-    yInfo() << log_ID << " - gate_pose:"      << paramsd["gate_pose"];
-    yInfo() << log_ID << " - play:"           << (paramsd["play"] == 1.0 ? "true" : "false");
+    yInfo() << log_ID << " - robot:"            << paramss["robot"];
+    yInfo() << log_ID << " - cam_sel:"          << paramss["cam_sel"];
+    yInfo() << log_ID << " - laterality:"       << paramss["laterality"];
+    yInfo() << log_ID << " - num_particles:"    << paramsd["num_particles"];
+    yInfo() << log_ID << " - gpu_count:"        << paramsd["gpu_count"];
+    yInfo() << log_ID << " - num_images:"       << paramsd["num_images"];
+    yInfo() << log_ID << " - resample_prior:"   << paramsd["resample_prior"];
+    yInfo() << log_ID << " - gate_pose:"        << paramsd["gate_pose"];
+    yInfo() << log_ID << " - play:"             << (paramsd["play"] == 1.0 ? "true" : "false");
+    yInfo() << log_ID << " - extraction method" << paramss["extraction_method"];
+    yInfo() << log_ID << " - extraction window" << paramsd["extraction_window"];
 
     yInfo() << log_ID << "Motion modle parameters:";
     yInfo() << log_ID << " - q_x:"        << paramsd["q_x"];
@@ -360,6 +364,8 @@ int main(int argc, char *argv[])
                       paramss["cam_sel"],
                       paramsd["num_particles"],
                       paramsd["resample_ratio"],
+                      paramss["extraction_mode"],
+                      paramsd["extraction_window"],
                       "handTracking/VisualSIS/" + paramss["cam_sel"]);
 
 

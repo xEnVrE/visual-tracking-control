@@ -44,6 +44,8 @@ VisualSIS::VisualSIS
     const std::string& cam_sel,
     const int num_particles,
     const double resample_ratio,
+    const std::string extraction_mode,
+    const std::size_t extraction_window,
     const std::string& port_prefix
 ) :
     ParticleFilter(std::move(initialization), std::move(prediction), std::move(correction), std::move(resampling)),
@@ -55,6 +57,9 @@ VisualSIS::VisualSIS
     estimate_extraction_(state_size_linear_, state_size_circular_)
 {
     port_estimates_out_.open("/" + port_prefix_ + "/estimates:o");
+
+    set_estimates_extraction_method(extraction_mode);
+    set_mobile_average_window(extraction_window);
 
     //port_image_out_.open("/" + port_prefix_ + "/img:o");
 
