@@ -48,8 +48,6 @@ struct VisualProprioception::ImplData
 
     std::unique_ptr<SICAD> si_cad_;
 
-    std::unique_ptr<SICAD> si_cad_debug_;
-
     int num_images_;
 
     const int block_size_ = 16;
@@ -121,13 +119,6 @@ VisualProprioception::VisualProprioception
                                                          num_requested_images,
                                                          rImpl.shader_folder_,
                                                          { 1.0, 0.0, 0.0, static_cast<float>(M_PI) }));
-
-        rImpl.si_cad_debug_ = std::unique_ptr<SICAD>(new SICAD(rImpl.mesh_paths_,
-							       rImpl.cam_params_.width, rImpl.cam_params_.height,
-							       rImpl.cam_params_.fx, rImpl.cam_params_.fy, rImpl.cam_params_.cx, rImpl.cam_params_.cy,
-							       num_requested_images,
-							       rImpl.shader_folder_,
-							       { 1.0, 0.0, 0.0, static_cast<float>(M_PI) }));
     }
     catch (const std::runtime_error& e)
     {
@@ -135,11 +126,6 @@ VisualProprioception::VisualProprioception
     }
 
     rImpl.num_images_ = rImpl.si_cad_->getTilesNumber();
-
-    if (rImpl.si_cad_->getTilesNumber() != rImpl.si_cad_debug_->getTilesNumber())
-    {
-        throw std::runtime_error("Debugging rendered engine cannot render the same number of tiles as the default rendering engine.");
-    }
 
     rImpl.feature_dim_ = (rImpl.cam_params_.width / rImpl.block_size_ * 2 - 1) * (rImpl.cam_params_.height / rImpl.block_size_ * 2 - 1) * rImpl.bin_number_ * 4;
 
@@ -166,7 +152,6 @@ VisualProprioception::~VisualProprioception() noexcept
 
 std::pair<bool, bfl::Data> VisualProprioception::measure(const bfl::Data& data) const
 {
-    //return std::make_pair(true, std::move(rImpl.cuda_descriptors_));
     return std::make_pair(true, pImpl_->cuda_descriptors_);
 }
 
@@ -203,9 +188,6 @@ std::pair<bool, bfl::Data> VisualProprioception::predictedMeasure(const Ref<cons
     std::tie(success, mesh_poses) = rImpl.mesh_model_->getModelPose(rotated_states);
     if (!success)
         return std::make_pair(false, MatrixXf::Zero(1, 1));
-
-    // rendering for debugging
-    superimpose(mesh_poses);
 
     success &= rImpl.si_cad_->superimpose(mesh_poses, camera_position.data(), camera_orientation.data(), 0);
     if (!success)
@@ -288,33 +270,4 @@ int VisualProprioception::getNumberOfUsedParticles() const
     ImplData& rImpl = *pImpl_;
 
     return rImpl.num_images_;
-}
-
-
-void VisualProprioception::superimpose(const std::vector<Superimpose::ModelPoseContainer>& obj2pos_map) const
-{
-    ImplData& rImpl = *pImpl_;
-
-    cv::Mat rendered;
-
-    std::array<double, 3> camera_position;
-    std::array<double, 4> camera_orientation;
-
-    try
-    {
-        std::tie(std::ignore, camera_position, camera_orientation) = bfl::any::any_cast<bfl::Camera::CameraData>(rImpl.camera_->getData());
-    }
-    catch(const bfl::any::bad_any_cast& e)
-    {
-        std::cout << rImpl.log_ID_ << "[superimpose] Error: " << e.what() << std::endl;
-
-        return;
-    }
-
-    rImpl.si_cad_debug_->superimpose(obj2pos_map, camera_position.data(), camera_orientation.data(), rendered);
-
-    cv::cvtColor(rendered, rendered, cv::COLOR_BGR2RGB);
-    ImageOf<PixelRgb>& image_out = rImpl.port_image_out_.prepare();
-    image_out = fromCvMat<PixelRgb>(rendered);
-    rImpl.port_image_out_.write();
 }

@@ -42,11 +42,6 @@ public:
      */
     int getNumberOfUsedParticles() const;
 
-    /* TODELETE
-     * For debugging walkman
-     */
-    void superimpose(const std::vector<Superimpose::ModelPoseContainer>& obj2pos_map) const;
-
     std::pair<std::size_t, std::size_t> getOutputSize() const override;
 
 private:
