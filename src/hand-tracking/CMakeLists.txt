@@ -214,7 +214,8 @@ set(${EXE_TARGET_NAME}_CUDA_SRC
 )
 
 set(${EXE_TARGET_NAME}_THRIFT_HDR
-      thrift/visualsisparticlefilter.thrift)
+      thrift/visualsisparticlefilter.thrift
+      thrift/brownianmotionpose.thrift)
 
 yarp_add_idl(${EXE_TARGET_NAME}_THRIFT_SRC ${${EXE_TARGET_NAME}_THRIFT_HDR})
 

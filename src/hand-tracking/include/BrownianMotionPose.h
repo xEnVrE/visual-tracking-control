@@ -13,8 +13,14 @@
 
 #include <BayesFilters/StateModel.h>
 
+#include <thrift/BrownianMotionPoseIDL.h>
 
-class BrownianMotionPose : public bfl::StateModel
+#include <yarp/os/Mutex.h>
+#include <yarp/os/Port.h>
+
+
+class BrownianMotionPose : public bfl::StateModel,
+                           public BrownianMotionPoseIDL
 {
 public:
     BrownianMotionPose(const double q_x, const double q_y, const double q_z, const double q_yaw, const double q_pitch, const double q_roll, const unsigned int seed) noexcept;
@@ -46,6 +52,35 @@ public:
     std::pair<std::size_t, std::size_t> getOutputSize() const override;
 
 protected:
+    void updateNoiseDistribution();
+
+    /**
+     * Thrift interface for parameters tuning.
+     */
+    bool set_q_x(const double q) override;
+
+    bool set_q_y(const double q) override;
+
+    bool set_q_z(const double q) override;
+
+    bool set_q_yaw(const double q) override;
+
+    bool set_q_pitch(const double q) override;
+
+    bool set_q_roll(const double q) override;
+
+    std::string get_q_x() override;
+
+    std::string get_q_y() override;
+
+    std::string get_q_z() override;
+
+    std::string get_q_yaw() override;
+
+    std::string get_q_pitch() override;
+
+    std::string get_q_roll() override;
+
     double                                 q_x_;         /* Noise standard deviation for x 3D position */
     double                                 q_y_;         /* Noise standard deviation for y 3D position */
     double                                 q_z_;         /* Noise standard deviation for z 3D position */
@@ -66,6 +101,10 @@ protected:
     std::function<double()>                gaussian_random_yaw_;
     std::function<double()>                gaussian_random_pitch_;
     std::function<double()>                gaussian_random_roll_;
+
+    yarp::os::Port port_rpc_command_;
+
+    yarp::os::Mutex rpc_mutex_;
 };
 
 #endif /* BROWNIANMOTIONPOSE_H */
