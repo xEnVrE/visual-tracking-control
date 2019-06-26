@@ -153,6 +153,7 @@ set(${EXE_TARGET_NAME}_HDR
       include/InitWalkmanArm.h
       include/IoU.h
       include/IoU_depth.h
+      include/IoU_exp.h
       include/KLD.h
       include/MeshModel.h
       include/NormOne.h
@@ -206,6 +207,7 @@ set(${EXE_TARGET_NAME}_CPU_SRC
       src/cpu/ChiSquare.cpp
       src/cpu/IoU.cpp
       src/cpu/IoU_depth.cpp
+      src/cpu/IoU_exp.cpp
       src/cpu/KLD.cpp
       src/cpu/NormOne.cpp
       src/cpu/NormTwo.cpp

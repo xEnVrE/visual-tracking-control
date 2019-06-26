@@ -84,17 +84,14 @@ VisualSIS::~VisualSIS() noexcept
 void VisualSIS::filteringStep()
 {
     /* PREDICTION */
-    std::cout << "Prediction" << std::endl;
     if (getFilteringStep() != 0)
         prediction_->predict(cor_particle_, pred_particle_);
 
 
     /* CORRECTION */
-    std::cout << "Correction" << std::endl;
     correction_->correct(pred_particle_, cor_particle_);
     /* Normalize weights using LogSumExp. */
     cor_particle_.weight().array() -= bfl::utils::log_sum_exp(cor_particle_.weight());
-    std::cout << "After correction." << std::endl;
 
     /* STATE ESTIMATE EXTRACTION FROM PARTICLE SET */
     VectorXd out_particle;

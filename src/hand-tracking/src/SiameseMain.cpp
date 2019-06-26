@@ -33,6 +33,7 @@
 #include <InitWalkmanArm.h>
 #include <IoU.h>
 #include <IoU_depth.h>
+#include <IoU_exp.h>
 #include <KLD.h>
 #include <NormOne.h>
 #include <NormTwo.h>
@@ -156,8 +157,10 @@ int main(int argc, char *argv[])
 
     /* Get Likelihood parameters */
     yarp::os::Bottle bottle_likelihood_params = rf.findGroup("LIKELIHOOD");
-    paramss["likelihood_type"] = bottle_likelihood_params.check("likelihood_type", Value("norm_one")).asString();
-    paramsd["likelihood_gain"] = bottle_likelihood_params.check("likelihood_gain", Value(0.001)).asDouble();
+    paramss["likelihood_type"] = bottle_likelihood_params.check("likelihood_type", Value("iou_depth")).asString();
+    paramsd["likelihood_gain_iou"] = bottle_likelihood_params.check("likelihood_gain_iou", Value(1.0)).asDouble();
+    paramsd["likelihood_gain_depth"] = bottle_likelihood_params.check("likelihood_gain_depth", Value(5.0)).asDouble();
+    paramsd["likelihood_step"] = bottle_likelihood_params.check("likelihood_step", Value(0)).asDouble();
 
 
     /* Get Gate Pose parameters */
@@ -316,7 +319,9 @@ int main(int argc, char *argv[])
     else if (paramss["likelihood_type"] == "iou")
         likelihood = std::unique_ptr<IoU>(new IoU(paramsd["likelihood_gain"]));
     else if (paramss["likelihood_type"] == "iou_depth")
-        likelihood = std::unique_ptr<IoU_depth>(new IoU_depth(paramsd["likelihood_gain"]));
+        likelihood = std::unique_ptr<IoU_depth>(new IoU_depth(paramsd["likelihood_gain"]));   
+    else if (paramss["likelihood_type"] == "iou_exp")     
+        likelihood = std::unique_ptr<IoU_exp>(new IoU_exp(paramsd["likelihood_gain_iou"], paramsd["likelihood_gain_depth"], paramsd["likelihood_step"]));
     else if (paramss["likelihood_type"] == "kld")
         likelihood = std::unique_ptr<KLD>(new KLD(paramsd["likelihood_gain"], 36));
     else if (paramss["likelihood_type"] == "norm_one")
