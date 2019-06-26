@@ -165,6 +165,7 @@ set(${EXE_TARGET_NAME}_HDR
       include/PlayGatePose.h
       include/PlayWalkmanPoseModel.h
       include/ReceiveDepth.h
+      include/ReceiveDepthYCB.h
       include/ReceiveMasks.h
       include/VisualProprioception.h
       include/VisualProprioceptionSiamese.h
@@ -195,6 +196,7 @@ set(${EXE_TARGET_NAME}_SRC
       src/PlayGatePose.cpp
       src/PlayWalkmanPoseModel.cpp
       src/ReceiveDepth.cpp
+      src/ReceiveDepthYCB.cpp
       src/ReceiveMasks.cpp
       src/SiameseMain.cpp
       src/VisualSIS.cpp
