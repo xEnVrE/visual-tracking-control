@@ -11,6 +11,9 @@
  */
 service BrownianMotionPoseIDL
 {
+    bool enable();
+    bool disable();
+
     bool set_q_x(1:double q);
     bool set_q_y(1:double q);
     bool set_q_z(1:double q);

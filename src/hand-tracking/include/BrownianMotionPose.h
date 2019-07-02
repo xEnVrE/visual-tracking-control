@@ -57,6 +57,10 @@ protected:
     /**
      * Thrift interface for parameters tuning.
      */
+    bool enable() override;
+
+    bool disable() override;
+
     bool set_q_x(const double q) override;
 
     bool set_q_y(const double q) override;
@@ -101,6 +105,9 @@ protected:
     std::function<double()>                gaussian_random_yaw_;
     std::function<double()>                gaussian_random_pitch_;
     std::function<double()>                gaussian_random_roll_;
+
+    /* Whether the noise generation is enabled or not */
+    bool enable_ = true;
 
     yarp::os::Port port_rpc_command_;
 

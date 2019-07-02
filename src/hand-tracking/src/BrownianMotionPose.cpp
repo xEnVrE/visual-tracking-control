@@ -169,6 +169,9 @@ void BrownianMotionPose::motion(const Eigen::Ref<const Eigen::MatrixXd>& cur_sta
 {
     propagate(cur_state, mot_state);
 
+    if (!enable_)
+        return;
+
     MatrixXd sample(6, mot_state.cols());
     sample = getNoiseSample(mot_state.cols());
 
@@ -238,6 +241,30 @@ void BrownianMotionPose::updateNoiseDistribution()
     gaussian_random_roll_ = [&] { return (distribution_roll_)(generator_); };
 
     rpc_mutex_.unlock();
+}
+
+
+bool BrownianMotionPose::enable()
+{
+    rpc_mutex_.lock();
+
+    enable_ = true;
+
+    rpc_mutex_.unlock();
+
+    return true;
+}
+
+
+bool BrownianMotionPose::disable()
+{
+    rpc_mutex_.lock();
+
+    enable_ = false;
+
+    rpc_mutex_.unlock();
+
+    return true;
 }
 
 
