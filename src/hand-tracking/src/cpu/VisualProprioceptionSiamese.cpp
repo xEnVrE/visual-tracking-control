@@ -103,7 +103,7 @@ VisualProprioceptionSiamese::VisualProprioceptionSiamese
         std::cout << "INFO::VISUALPROPRIOCEPTION::CTOR" << std::endl
                   << "Camera driver not ready, reading intrinsic paramers from fallback configuration" << std::endl;
         std::cout << "INFO::VISUALPROPRIOCEPTION::CTOR" << std::endl
-                  << "Using fallback configuration 'camera_640_480'" << std::endl;
+                  << "Using fallback configuration" << std::endl;
 
         ResourceFinder rf;
         rf.setVerbose(false);
@@ -111,7 +111,7 @@ VisualProprioceptionSiamese::VisualProprioceptionSiamese
         rf.setDefaultConfigFile("realsense_camera_config.ini");
         rf.configure(0, nullptr);
 
-        ResourceFinder rf_camera = rf.findNestedResourceFinder("camera_640_480");
+        ResourceFinder rf_camera = rf.findNestedResourceFinder("ycb_camera_320_240");
         rImpl.cam_params_.width = rf_camera.find("width").asDouble();
         rImpl.cam_params_.height = rf_camera.find("height").asDouble();
         rImpl.cam_params_.fx = rf_camera.find("fx").asDouble();

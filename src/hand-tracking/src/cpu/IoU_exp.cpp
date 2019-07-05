@@ -132,7 +132,7 @@ std::pair<bool, VectorXd> IoU_exp::likelihood(const MeasurementModel& measuremen
             if (num_of_pixels != 0)
                 particle_depth_likelihood = depth_sum/num_of_pixels;
             else
-                particle_depth_likelihood = 0.0;
+                particle_depth_likelihood = 1.0;
 
             print_sum = depth_sum;
             depth_sum = 0;
@@ -154,12 +154,12 @@ std::pair<bool, VectorXd> IoU_exp::likelihood(const MeasurementModel& measuremen
 //    likelihood_iou.normalize();
 //    likelihood_depth.normalize();
 
-    likelihood = 1.5*likelihood_iou + likelihood_depth;
+    likelihood = likelihood_iou + likelihood_depth;
 //likelihood = (-(pImpl_->likelihood_gain_) * (likelihood_iou)).array().exp();
 // Try to normalize the total likelihood!
 // likelihood.normalize();
 
-  
+
     (pImpl_->likelihood_step_)++;
     if (int(pImpl_->likelihood_step_) % 100 == 0)
     {
