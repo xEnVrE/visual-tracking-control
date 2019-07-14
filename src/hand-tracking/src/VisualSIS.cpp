@@ -7,6 +7,7 @@
 
 #include <VisualSIS.h>
 #include <utils.h>
+#include <ReceiveGT.h>
 
 #include <exception>
 #include <utility>
@@ -17,6 +18,7 @@
 #include <yarp/eigen/Eigen.h>
 #include <yarp/math/Math.h>
 #include <yarp/os/LogStream.h>
+#include <yarp/os/Stamp.h>
 
 #include <BayesFilters/utils.h>
 
@@ -25,14 +27,10 @@
 
 using namespace bfl;
 using namespace Eigen;
-//using namespace iCub::ctrl;
-//using namespace iCub::iKin;
 using namespace yarp::eigen;
 using namespace yarp::math;
 using namespace yarp::os;
 using yarp::sig::Vector;
-//using yarp::sig::ImageOf;
-//using yarp::sig::PixelRgb;
 using namespace hand_tracking::utils;
 
 
@@ -42,6 +40,7 @@ VisualSIS::VisualSIS
     std::unique_ptr<bfl::PFPrediction> prediction,
     std::unique_ptr<bfl::PFCorrection> correction,
     std::unique_ptr<bfl::Resampling> resampling,
+    std::unique_ptr<ReceiveGT> receive_gt,
     const std::string& cam_sel,
     const int num_particles,
     const double resample_ratio,
@@ -57,9 +56,13 @@ VisualSIS::VisualSIS
 {
     port_estimates_out_.open("/" + port_prefix_ + "/estimate:o");
 
+    port_gt_out_.open("/" + port_prefix_ + "/gt_synch:o");
+
     //port_image_out_.open("/" + port_prefix_ + "/img:o");
 
     setCommandPort();
+
+    receive_gt_ = std::move(receive_gt);
 }
 
 
@@ -71,6 +74,8 @@ bool VisualSIS::initialization()
 
     skip("all", false);
 
+    int streaming_counter_ = 0;
+
     return true;
 }
 
@@ -78,6 +83,8 @@ bool VisualSIS::initialization()
 VisualSIS::~VisualSIS() noexcept
 {
     port_estimates_out_.close();
+
+    port_gt_out_.close();
 }
 
 
@@ -86,7 +93,7 @@ void VisualSIS::filteringStep()
     /* PREDICTION */
     if (getFilteringStep() != 0)
         prediction_->predict(cor_particle_, pred_particle_);
-
+        
 
     /* CORRECTION */
     correction_->correct(pred_particle_, cor_particle_);
@@ -104,6 +111,7 @@ void VisualSIS::filteringStep()
     /* RESAMPLING */
     yInfo() << log_ID_ << "Step:" << getFilteringStep();
     yInfo() << log_ID_ << "Neff:" << resampling_->neff(cor_particle_.weight());
+    //std::cout << log_ID_ << "Weights:" << cor_particle_.weight().array().exp();
     if (resampling_->neff(cor_particle_.weight()) < std::round(num_particles_ * resample_ratio_))
     {
         yInfo() << log_ID_ << "Resampling!";
@@ -115,63 +123,17 @@ void VisualSIS::filteringStep()
 
         cor_particle_ = res_particle;
     }
-
-
-    /* STATE ESTIMATE OUTPUT */
-    /* INDEX FINGERTIP */
-//    Vector q = readRootToEE();
-//    icub_kin_arm_.setAng(q.subVector(0, 9) * (M_PI/180.0));
-//    Vector chainjoints;
-//    if (analogs_) icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), analogs, chainjoints, right_hand_analogs_bounds_);
-//    else          icub_kin_finger_[1].getChainJoints(q.subVector(3, 18), chainjoints);
-//    icub_kin_finger_[1].setAng(chainjoints * (M_PI/180.0));
-//
-//    Vector l_ee_t(3);
-//    toEigen(l_ee_t) = out_particle.col(0).head(3).cast<double>();
-//    l_ee_t.push_back(1.0);
-//
-//    Vector l_ee_o(3);
-//    toEigen(l_ee_o) = out_particle.col(0).tail(3).normalized().cast<double>();
-//    l_ee_o.push_back(static_cast<double>(out_particle.col(0).tail(3).norm()));
-//
-//    yarp::sig::Matrix l_Ha = axis2dcm(l_ee_o);
-//    l_Ha.setCol(3, l_ee_t);
-//    Vector l_i_x = (l_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
-//    Vector l_i_o = dcm2axis(l_Ha * icub_kin_finger_[1].getH(3, true));
-//    l_i_o.setSubvector(0, l_i_o.subVector(0, 2) * l_i_o[3]);
-//
-//
-//    Vector r_ee_t(3);
-//    toEigen(r_ee_t) = out_particle.col(1).head(3).cast<double>();
-//    r_ee_t.push_back(1.0);
-//
-//    Vector r_ee_o(3);
-//    toEigen(r_ee_o) = out_particle.col(1).tail(3).normalized().cast<double>();
-//    r_ee_o.push_back(static_cast<double>(out_particle.col(1).tail(3).norm()));
-//
-//    yarp::sig::Matrix r_Ha = axis2dcm(r_ee_o);
-//    r_Ha.setCol(3, r_ee_t);
-//    Vector r_i_x = (r_Ha * (icub_kin_finger_[1].getH(3, true).getCol(3))).subVector(0, 2);
-//    Vector r_i_o = dcm2axis(r_Ha * icub_kin_finger_[1].getH(3, true));
-//    r_i_o.setSubvector(0, r_i_o.subVector(0, 2) * r_i_o[3]);
-//
-//
-//    Vector& estimates_out = port_estimates_out_.prepare();
-//    estimates_out.resize(12);
-//    estimates_out.setSubvector(0, l_i_x);
-//    estimates_out.setSubvector(3, l_i_o.subVector(0, 2));
-//    estimates_out.setSubvector(6, r_i_x);
-//    estimates_out.setSubvector(9, r_i_o.subVector(0, 2));
-//    port_estimates_out_.write();
-
-
-    /* PALM */
+    
 
     /*
      * Convert from Euler ZYX to axis angle.
      */
     if (valid_estimate)
     {
+
+        double now = yarp::os::Time::now();
+        yarp::os::Stamp port_time_stamp(streaming_counter_++, now);
+
         VectorXd out_particle_axis_angle(7);
         out_particle_axis_angle.head<3>() = out_particle.head<3>();
         out_particle_axis_angle.segment<4>(3) = euler_to_axis_angle(out_particle.tail<3>(), AxisOfRotation::UnitZ, AxisOfRotation::UnitY, AxisOfRotation::UnitX);
@@ -179,24 +141,18 @@ void VisualSIS::filteringStep()
         Vector& estimates_out = port_estimates_out_.prepare();
         estimates_out.resize(7);
         toEigen(estimates_out) = out_particle_axis_angle;
+        port_estimates_out_.setEnvelope(port_time_stamp);
         port_estimates_out_.write();
+
+
+        Vector gt_ = bfl::any::any_cast<yarp::sig::Vector>(receive_gt_->GetGT());
+        Vector& gt_out = port_gt_out_.prepare();
+        gt_out = gt_;
+        port_gt_out_.setEnvelope(port_time_stamp);
+        port_gt_out_.write();
     }
 
-    /* STATE ESTIMATE OUTPUT */
-//    Superimpose::ModelPoseContainer hand_pose;
-//    Superimpose::ModelPose          pose;
-//    ImageOf<PixelRgb>& img_out = port_image_out_.prepare();
-//
-//    pose.assign(out_particle.data(), out_particle.data() + 3);
-//    pose.insert(pose.end(), out_particle.data() + 3, out_particle.data() + 7);
-//    hand_pose.emplace("palm", pose);
-//
-//    dynamic_cast<VisualProprioception*>(&dynamic_cast<VisualUpdateParticles*>(correction_.get())->getVisualObservationModel())->superimpose(hand_pose, measurement);
-//
-//    img_out.setExternal(measurement.ptr(), img_width_, img_height_);
-//
-//    port_image_out_.write();
-    /* ********** */
+
 }
 
 

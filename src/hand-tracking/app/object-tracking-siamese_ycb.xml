@@ -4,7 +4,7 @@
   <name>object-tracking-siamese</name>
   <description></description>
 
-  <!-- MODULES 
+  <!-- MODULES -->
   <module>
     <name>object-tracking-siamese</name>
     <parameters></parameters>
@@ -15,7 +15,7 @@
     <name>siamese-ground-truth</name>
     <parameters></parameters>
     <node>localhost</node>
-  </module> -->
+  </module>
 
   <module>
     <name>object-tracking-viewer</name>
@@ -23,12 +23,12 @@
     <node>localhost</node>
   </module>
 
-  <!-- <module>
+  <module>
     <name>yarpview</name>
     <parameters>--name /object-tracking/viewer/groundTruthImage:i</parameters>
     <node>localhost</node>
     <prefix></prefix>
-  </module> -->
+  </module>
 
   <module>
     <name>yarpview</name>
@@ -44,12 +44,12 @@
     <prefix></prefix>
   </module>
 
- <!--  <module>
+  <module>
     <name>yarpview</name>
     <parameters>--name /object-tracking/viewer/depthImage:i</parameters>
     <node>localhost</node>
     <prefix></prefix>
-  </module> -->
+  </module>
 
 
   <!-- CONNECTIONS -->
@@ -70,9 +70,14 @@
 
   <!-- Viewers -->
   <connection>
-    <!--<from>/depthCamera/rgbImage:o</from>-->
-    <from>/siamese-ground-truth/dumpImage:o</from>
+    <from>/depthCamera/rgbImage:o</from>
     <to>/object-tracking/viewer/rgbImage:i</to>
+    <protocol>mjpeg</protocol>
+  </connection>
+
+  <connection>
+    <from>/siamese-ground-truth/estimateMarkerImage:o</from>
+    <to>/object-tracking/viewer/groundTruthImage:i</to>
     <protocol>mjpeg</protocol>
   </connection>
 
@@ -84,8 +89,7 @@
 
   <!-- Camera to ground-truth module -->
   <connection>
-    <!-- <from>/depthCamera/rgbImage:o</from> -->
-    <from>/siamese-ground-truth/dumpImage:o</from>
+    <from>/depthCamera/rgbImage:o</from>
     <to>/siamese-ground-truth/rgbImage:i</to>
     <protocol>mjpeg</protocol>
   </connection>
@@ -106,40 +110,29 @@
 
   <!-- Camera to 3D Viewer -->
   <connection>
-    <!-- <from>/depthCamera/rgbImage:o</from> -->
-    <from>/siamese-ground-truth/dumpImage:o</from>
+    <from>/depthCamera/rgbImage:o</from>
     <to>/object-tracking-viewer/rgbImage:i</to>
     <protocol>mjpeg</protocol>
   </connection>
 
   <!-- Camera depth to 3D Viewer -->
   <connection>
-    <!-- <from>/depthCamera/depthImage:o</from> -->
-    <from>/siamese-ground-truth/dumpDepth:o</from>
+    <from>/depthCamera/depthImage:o</from>
     <to>/object-tracking-viewer/depthImage:i</to>
     <protocol>tcp</protocol>
   </connection>
 
   <!-- Camera depth to depth dumper -->
   <connection>
-    <!-- <from>/depthCamera/depthImage:o</from> -->
-    <from>/siamese-ground-truth/dumpDepth:o</from>
+    <from>/depthCamera/depthImage:o</from>
     <to>/siamese-ground-truth/dumpDepth:i</to>
     <protocol>tcp</protocol>
   </connection>
 
   <!-- Ground truth to 3D viewer -->
   <connection>
-    <!-- <from>/siamese-ground-truth/estimateMarker:o</from> -->
-    <from>/siamese-ground-truth/estimate:o</from>
+    <from>/siamese-ground-truth/estimateMarker:o</from>
     <to>/object-tracking-viewer/ground-truth:i</to>
-    <protocol>tcp</protocol>
-  </connection>
-
-<!-- Ground truth to VisualSIS for dumping prediction -->
-  <connection>
-    <from>/siamese-ground-truth/estimate:o</from>
-    <to>/object-tracking-siamese/ground-truth:i</to>
     <protocol>tcp</protocol>
   </connection>
 
@@ -159,18 +152,17 @@
 
   <!-- Siamese network to mask reception part  -->
   <connection>
-    <!-- <from>/depthCamera/depthImage:o</from> -->
-    <from>/siamese-ground-truth/dumpDepth:o</from>
+    <from>/depthCamera/depthImage:o</from>
     <to>/siamese/receive_depth:i</to>
     <protocol>tcp</protocol>
   </connection>
 
-  <!-- Camera depth to Viewer 
+  <!-- Camera depth to Viewer -->
   <connection>
     <from>/depthCamera/depthImage:o</from>
     <to>/object-tracking/viewer/depthImage:i</to>
     <protocol>tcp</protocol>
-  </connection> -->
+  </connection>
 
 
 </application>

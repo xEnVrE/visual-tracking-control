@@ -165,6 +165,7 @@ set(${EXE_TARGET_NAME}_HDR
       include/PlayGatePose.h
       include/PlayWalkmanPoseModel.h
       include/ReceiveDepth.h
+      include/ReceiveGT.h
       include/ReceiveMasks.h
       include/VisualProprioception.h
       include/VisualProprioceptionSiamese.h
@@ -195,6 +196,7 @@ set(${EXE_TARGET_NAME}_SRC
       src/PlayGatePose.cpp
       src/PlayWalkmanPoseModel.cpp
       src/ReceiveDepth.cpp
+      src/ReceiveGT.cpp
       src/ReceiveMasks.cpp
       src/SiameseMain.cpp
       src/VisualSIS.cpp
@@ -387,6 +389,18 @@ set(${EXE_TARGET_NAME}_SHADER_FRAG
 set(${EXE_TARGET_NAME}_MESH
       ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/mustard_bottle.obj
       ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/mustard_bottle.ply
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/sugar_box.obj
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/sugar_box.ply
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/mug.obj
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/mug.ply
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/tomato_soup_can.obj
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/tomato_soup_can.ply
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/banana.obj
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/banana.ply
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/gelatin_box.obj
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/gelatin_box.ply
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/pitcher_base.obj
+      ${CMAKE_CURRENT_SOURCE_DIR}/mesh/ycb/pitcher_base.ply
 )
 
 add_custom_command(TARGET  ${EXE_TARGET_NAME} POST_BUILD

@@ -16,6 +16,8 @@
 #include <yarp/cv/Cv.h>
 #include <yarp/sig/all.h>
 
+ #include <opencv2/imgcodecs.hpp>
+
 using namespace bfl;
 using namespace Eigen;
 using namespace yarp::cv;
@@ -98,6 +100,8 @@ std::pair<bool, VectorXd> IoU_exp::likelihood(const MeasurementModel& measuremen
     if (!valid_predicted_measurements)
         return std::make_pair(false, VectorXd::Zero(1));
 
+    //cv::imwrite("./mask.jpg", predicted_mask_measurements);
+
 
     VectorXd likelihood(pred_states.cols()), likelihood_iou(pred_states.cols()), likelihood_depth(pred_states.cols());
     cv::Mat Intersection, Union, rendered_image, rendered_depth, distance, depth_difference, depth_intersection;
@@ -159,7 +163,7 @@ std::pair<bool, VectorXd> IoU_exp::likelihood(const MeasurementModel& measuremen
 // Try to normalize the total likelihood!
 // likelihood.normalize();
 
-
+/*
     (pImpl_->likelihood_step_)++;
     if (int(pImpl_->likelihood_step_) % 100 == 0)
     {
@@ -194,6 +198,6 @@ std::pair<bool, VectorXd> IoU_exp::likelihood(const MeasurementModel& measuremen
         fout3.close();
         fout4.close();
     }
-
+*/
     return std::make_pair(true, std::move(likelihood));
 }

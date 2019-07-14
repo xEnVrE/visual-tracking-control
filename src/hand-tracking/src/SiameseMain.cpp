@@ -44,6 +44,7 @@
 #include <PlayWalkmanPoseModel.h>
 #include <PlayGatePose.h>
 #include <ReceiveMasks.h>
+#include <ReceiveGT.h>
 #include <ReceiveDepth.h>
 #include <VisualProprioception.h>
 #include <VisualProprioceptionSiamese.h>
@@ -189,6 +190,7 @@ int main(int argc, char *argv[])
     yInfo() << log_ID << " - resample_prior:" << paramsd["resample_prior"];
     yInfo() << log_ID << " - gate_pose:"      << paramsd["gate_pose"];
     yInfo() << log_ID << " - play:"           << (paramsd["play"] == 1.0 ? "true" : "false");
+    yInfo() << log_ID << " - object_name:"      << paramss["object_name"];
 
     yInfo() << log_ID << "Motion modle parameters:";
     yInfo() << log_ID << " - q_x:"        << paramsd["q_x"];
@@ -252,6 +254,7 @@ int main(int argc, char *argv[])
     std::unique_ptr<MeshModel> mesh_model;
     std::unique_ptr<ReceiveMasks> receive_masks;
     std::unique_ptr<ReceiveDepth> receive_depth;
+    std::unique_ptr<ReceiveGT> receive_gt;
     if (paramss["robot"] == "icub")
     {
         camera = std::unique_ptr<Camera>(new iCubCamera(paramss["cam_sel"],
@@ -282,6 +285,8 @@ int main(int argc, char *argv[])
         receive_masks = std::unique_ptr<ReceiveMasks>(new ReceiveMasks());
 
         receive_depth = std::unique_ptr<ReceiveDepth>(new ReceiveDepth());
+
+        receive_gt = std::unique_ptr<ReceiveGT>(new ReceiveGT());
     }
     else
     {
@@ -368,6 +373,7 @@ int main(int argc, char *argv[])
                       std::move(pf_prediction),
                       std::move(vpf_correction),
                       std::move(pf_resampling),
+                      std::move(receive_gt),
                       paramss["cam_sel"],
                       paramsd["num_particles"],
                       paramsd["resample_ratio"],

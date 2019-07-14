@@ -36,12 +36,14 @@
 #include <yarp/sig/Matrix.h>
 #include <yarp/sig/Vector.h>
 
+#include <ReceiveGT.h>
+
 
 class VisualSIS: public bfl::ParticleFilter,
                  public VisualSISParticleFilterIDL
 {
 public:
-    VisualSIS(std::unique_ptr<bfl::ParticleSetInitialization> initialization, std::unique_ptr<bfl::PFPrediction> prediction, std::unique_ptr<bfl::PFCorrection> correction, std::unique_ptr<bfl::Resampling> resampling, const std::string& cam_sel, const int num_particles, const double resample_ratio, const std::string& port_prefix);
+    VisualSIS(std::unique_ptr<bfl::ParticleSetInitialization> initialization, std::unique_ptr<bfl::PFPrediction> prediction, std::unique_ptr<bfl::PFCorrection> correction, std::unique_ptr<bfl::Resampling> resampling, std::unique_ptr<ReceiveGT> receive_gt, const std::string& cam_sel, const int num_particles, const double resample_ratio, const std::string& port_prefix);
 
     ~VisualSIS() noexcept;
 
@@ -54,11 +56,17 @@ protected:
 
     int num_particles_;
 
+    int streaming_counter_;
+
     double resample_ratio_;
 
     unsigned int descriptor_length_;
 
+    std::unique_ptr<ReceiveGT> receive_gt_;
+
     yarp::os::BufferedPort<yarp::sig::Vector> port_estimates_out_;
+
+    yarp::os::BufferedPort<yarp::sig::Vector> port_gt_out_;
 
     yarp::os::Port port_rpc_command_;
 

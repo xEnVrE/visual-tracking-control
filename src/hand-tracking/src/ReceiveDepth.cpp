@@ -31,7 +31,7 @@ ReceiveDepth::~ReceiveDepth()
 Data ReceiveDepth::GetDepth()
 {
     ImageOf<PixelFloat>* inputPtr = SiamesePort.read(false);
-    
+
     if (inputPtr != nullptr)
     {
         inputDepth = *inputPtr;
